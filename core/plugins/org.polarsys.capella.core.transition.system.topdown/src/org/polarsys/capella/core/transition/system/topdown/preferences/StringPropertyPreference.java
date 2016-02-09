@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 THALES GLOBAL SERVICES.
+ * Copyright (c) 2006, 2016 THALES GLOBAL SERVICES.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.polarsys.capella.core.transition.system.topdown.preferences;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.polarsys.capella.common.flexibility.properties.property.AbstractProperty;
@@ -18,8 +19,10 @@ import org.polarsys.capella.common.flexibility.properties.schema.IEditableProper
 import org.polarsys.capella.common.flexibility.properties.schema.IPropertyContext;
 import org.polarsys.capella.common.flexibility.properties.schema.PropertiesSchemaConstants;
 import org.polarsys.capella.core.commands.preferences.service.ScopedCapellaPreferencesStore;
+import org.polarsys.capella.core.commands.preferences.util.PreferencesHelper;
 
 /**
+ *
  */
 public class StringPropertyPreference extends AbstractProperty implements IEditableProperty, IDefaultValueProperty {
 
@@ -37,37 +40,40 @@ public class StringPropertyPreference extends AbstractProperty implements IEdita
   /**
    * {@inheritDoc}
    */
-  public Object getValue(IPropertyContext context_p) {
+  public Object getValue(IPropertyContext context) {
     String scope = getParameter(PropertiesSchemaConstants.PropertiesSchema_PROPERTY_PREFERENCE__SCOPE);
-
     String preferenceId = getId();
     if (isArgumentSet(PropertiesSchemaConstants.PropertiesSchema_PROPERTY_PREFERENCE__PREFERENCE_ID)) {
       preferenceId = getParameter(PropertiesSchemaConstants.PropertiesSchema_PROPERTY_PREFERENCE__PREFERENCE_ID);
     }
-
     return ScopedCapellaPreferencesStore.getInstance(scope).getString(preferenceId);
   }
 
   /**
    * {@inheritDoc}
    */
-  public void setValue(IPropertyContext context_p) {
-    String scope = getParameter(PropertiesSchemaConstants.PropertiesSchema_PROPERTY_PREFERENCE__SCOPE);
-    Object value = context_p.getCurrentValue(this);
-
+  public void setValue(IPropertyContext context) {
+    Object value = context.getCurrentValue(this);
     String preferenceId = getId();
     if (isArgumentSet(PropertiesSchemaConstants.PropertiesSchema_PROPERTY_PREFERENCE__PREFERENCE_ID)) {
       preferenceId = getParameter(PropertiesSchemaConstants.PropertiesSchema_PROPERTY_PREFERENCE__PREFERENCE_ID);
     }
 
-    ScopedCapellaPreferencesStore.getInstance(scope).setValue(preferenceId, ((String) toType(value, context_p)));
+    IProject project = PreferencesHelper.getSelectedCapellaProject();
+    String value2 = ((String) this.toType(value, context));
+    ScopedCapellaPreferencesStore.getOptions().put(preferenceId, String.valueOf(value2));
+    if (project != null) {
+      ScopedCapellaPreferencesStore.putString(project, preferenceId, value2);
+    } else {
+      ScopedCapellaPreferencesStore.putString(null, preferenceId, value2);
+    }
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public IStatus validate(Object newValue, IPropertyContext context_p) {
+  public IStatus validate(Object newValue, IPropertyContext context) {
     try {
       if (newValue != null) {
         String value = String.valueOf(newValue);
@@ -77,9 +83,7 @@ public class StringPropertyPreference extends AbstractProperty implements IEdita
           return new Status(IStatus.ERROR, getId(), "Empty value isn't valid");
         }
       }
-
       return Status.OK_STATUS;
-
     } catch (Exception e) {
       return new Status(IStatus.ERROR, getId(), e.getMessage());
     }
@@ -88,14 +92,13 @@ public class StringPropertyPreference extends AbstractProperty implements IEdita
   /**
    * {@inheritDoc}
    */
-  public Object getDefaultValue(IPropertyContext context_p) {
+  public Object getDefaultValue(IPropertyContext context) {
     String argument = getParameter(PropertiesSchemaConstants.PropertiesSchema_PROPERTY_PREFERENCE__DEFAULT);
-    return toType(argument, context_p);
+    return toType(argument, context);
   }
 
   @Override
-  public Object toType(Object value_p, IPropertyContext context_p) {
-    return value_p;
+  public Object toType(Object value, IPropertyContext context) {
+    return value;
   }
-
 }

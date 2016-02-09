@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2014 THALES GLOBAL SERVICES.
+ * Copyright (c) 2006, 2016 THALES GLOBAL SERVICES.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,14 +10,12 @@
  *******************************************************************************/
 package org.polarsys.capella.core.commands.preferences.service;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
-import org.polarsys.capella.core.commands.preferences.util.PreferencesHelper;
-
 /**
+ *
  */
 public class PreferenceField extends BooleanFieldEditor {
 
@@ -42,34 +40,13 @@ public class PreferenceField extends BooleanFieldEditor {
   }
 
   @Override
-  protected void valueChanged(boolean oldValue_p, boolean newValue_p) {
-    super.valueChanged(oldValue_p, newValue_p);
+  protected void valueChanged(boolean oldValue, boolean newValue) {
+    super.valueChanged(oldValue, newValue);
   }
 
   @Override
-  protected void fireValueChanged(String property_p, Object oldValue_p, Object newValue_p) {
-    super.fireValueChanged(property_p, oldValue_p, newValue_p);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public String getPreferenceName() {
-    IProject selectedProject =
-        PreferencesHelper.getSelectedEclipseProject() != null ? PreferencesHelper.getSelectedEclipseProject() : PreferencesHelper.getSelectedCapellaProject();
-    String preferenceName = super.getPreferenceName();
-
-    return preferenceName;
-  }
-
-
-  /**
-   * @param selectedProject_p
-   * @param key_p
-   */
-  private void doLoadDefautlPrefrence(IProject selectedProject_p, String key_p) {
-    PreferencesHelper.getProjectScope(selectedProject_p);
+  protected void fireValueChanged(String property, Object oldValue, Object newValue) {
+    super.fireValueChanged(property, oldValue, newValue);
   }
 
   /**
