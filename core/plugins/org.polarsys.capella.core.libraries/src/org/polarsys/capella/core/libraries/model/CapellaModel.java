@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 THALES GLOBAL SERVICES.
+ * Copyright (c) 2006, 2017 THALES GLOBAL SERVICES.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -38,6 +38,7 @@ import org.polarsys.capella.common.libraries.ModelInformation;
 import org.polarsys.capella.core.data.capellamodeller.Project;
 import org.polarsys.capella.core.libraries.Activator;
 import org.polarsys.capella.core.platform.sirius.ui.commands.CapellaDeleteCommand;
+import org.polarsys.kitalpha.ad.metadata.helpers.LibraryHelper;
 
 public class CapellaModel extends AbstractCapellaModel implements IModel.Edit {
 
@@ -128,6 +129,10 @@ public class CapellaModel extends AbstractCapellaModel implements IModel.Edit {
           }
         }
 
+        // manage afm before adding the new semantic resource: a listener will be call at this moment and it needs up-to-date metadata
+        if (referencedLibrary_p instanceof CapellaModel)
+        	LibraryHelper.add(_domain.getResourceSet(), getUriSemanticFile(), ((CapellaModel)referencedLibrary_p).getUriSemanticFile());
+
         // otherwise, we add a reference
         LibraryReference result = LibrariesFactory.eINSTANCE.createLibraryReference();
         result.setLibrary(target);
@@ -150,6 +155,7 @@ public class CapellaModel extends AbstractCapellaModel implements IModel.Edit {
           toAdd.eAdapters().add(session.getSemanticCrossReferencer());
         }
 
+        
         notifyLibraryChange(source);
       }
     });
@@ -165,6 +171,10 @@ public class CapellaModel extends AbstractCapellaModel implements IModel.Edit {
 
         LibraryReference toDelete = null;
 
+        // manage afm before removing the new semantic resource: a listener will be call at this moment and it needs up-to-date metadata
+        if (referencedLibrary_p instanceof CapellaModel)
+        	LibraryHelper.remove(_domain.getResourceSet(), getUriSemanticFile(), ((CapellaModel)referencedLibrary_p).getUriSemanticFile());
+        
         // if reference is made, we remove the reference
         for (LibraryReference reference : source.getOwnedReferences()) {
           if (reference.getLibrary() != null) {
