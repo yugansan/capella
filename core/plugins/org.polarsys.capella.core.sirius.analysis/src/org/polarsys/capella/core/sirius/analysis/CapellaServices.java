@@ -79,13 +79,13 @@ import org.polarsys.capella.common.data.modellingcore.AbstractTypedElement;
 import org.polarsys.capella.common.data.modellingcore.ModelElement;
 import org.polarsys.capella.common.data.modellingcore.ModellingcorePackage;
 import org.polarsys.capella.common.data.modellingcore.TraceableElement;
+import org.polarsys.capella.common.helpers.EObjectLabelProviderHelper;
 import org.polarsys.capella.common.helpers.EcoreUtil2;
 import org.polarsys.capella.common.helpers.TransactionHelper;
 import org.polarsys.capella.common.libraries.ILibraryManager;
 import org.polarsys.capella.common.libraries.IModel;
 import org.polarsys.capella.common.platform.sirius.ted.SemanticEditingDomainFactory.SemanticEditingDomain;
 import org.polarsys.capella.common.queries.interpretor.QueryInterpretor;
-import org.polarsys.capella.common.ui.services.helper.EObjectLabelProviderHelper;
 import org.polarsys.capella.core.business.queries.IBusinessQuery;
 import org.polarsys.capella.core.business.queries.capellacore.BusinessQueriesProvider;
 import org.polarsys.capella.core.data.capellacore.CapellaElement;
@@ -967,29 +967,31 @@ public class CapellaServices {
     returnedFunctions.addAll(FunctionExt.getAllAbstractFunctions(rootFunction));
     returnedFunctions.removeAll(ownedNodes);
 
-    for (DDiagramElementContainer aNodeContainer : allGraphicalContainers) {
-      List<AbstractFunction> toBeRemoved = new ArrayList<AbstractFunction>();
-      if (aNodeContainer.getTarget() instanceof AbstractFunction) {
-        returnedFunctions.remove(aNodeContainer.getTarget());
-        for (AbstractFunction anAbstractFunction : returnedFunctions) {
-          if (EcoreUtil.isAncestor(anAbstractFunction, aNodeContainer.getTarget())) {
-            toBeRemoved.add(anAbstractFunction);
-          }
-        }
-      }
-      List<DNode> ownedBorderedNodes = aNodeContainer.getOwnedBorderedNodes();
-      for (DNode aNode : aNodeContainer.getNodes()) {
-        if ((aNode.getTarget() instanceof AbstractFunction) && !ownedBorderedNodes.contains(aNode)) {
-          returnedFunctions.remove(aNode.getTarget());
+    if(allGraphicalContainers != null){
+      for (DDiagramElementContainer aNodeContainer : allGraphicalContainers) {
+        List<AbstractFunction> toBeRemoved = new ArrayList<AbstractFunction>();
+        if (aNodeContainer.getTarget() instanceof AbstractFunction) {
+          returnedFunctions.remove(aNodeContainer.getTarget());
           for (AbstractFunction anAbstractFunction : returnedFunctions) {
-            if (EcoreUtil.isAncestor(anAbstractFunction, aNode.getTarget())) {
+            if (EcoreUtil.isAncestor(anAbstractFunction, aNodeContainer.getTarget())) {
               toBeRemoved.add(anAbstractFunction);
             }
           }
         }
+        List<DNode> ownedBorderedNodes = aNodeContainer.getOwnedBorderedNodes();
+        for (DNode aNode : aNodeContainer.getNodes()) {
+          if ((aNode.getTarget() instanceof AbstractFunction) && !ownedBorderedNodes.contains(aNode)) {
+            returnedFunctions.remove(aNode.getTarget());
+            for (AbstractFunction anAbstractFunction : returnedFunctions) {
+              if (EcoreUtil.isAncestor(anAbstractFunction, aNode.getTarget())) {
+                toBeRemoved.add(anAbstractFunction);
+              }
+            }
+          }
+        }
+        returnedFunctions.removeAll(toBeRemoved);
+        toBeRemoved = null;
       }
-      returnedFunctions.removeAll(toBeRemoved);
-      toBeRemoved = null;
     }
     return returnedFunctions;
   }

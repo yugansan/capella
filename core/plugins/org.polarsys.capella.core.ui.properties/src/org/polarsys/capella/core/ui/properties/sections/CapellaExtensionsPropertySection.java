@@ -27,7 +27,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
-import org.polarsys.capella.common.ui.services.helper.EObjectLabelProviderHelper;
+import org.polarsys.capella.common.ui.services.helper.EObjectImageProviderHelper;
 import org.polarsys.capella.common.mdsofa.common.constant.ICommonConstants;
 import org.polarsys.capella.core.data.cs.CsPackage;
 import org.polarsys.capella.core.data.cs.Part;
@@ -82,7 +82,7 @@ public class CapellaExtensionsPropertySection extends AbstractSection implements
     @Override
     public Image getImage(Object element) {
       if (element instanceof EObject) {
-        return EObjectLabelProviderHelper.getImage((EObject) element);
+        return EObjectImageProviderHelper.getImage((EObject) element);
       }
       return super.getImage(element);
     }

@@ -182,7 +182,35 @@
          unpack="false"/>
 
    <plugin
+         id="org.polarsys.capella.test.commandline.ju"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
          id="org.polarsys.capella.test.migration.ju"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.polarsys.capella.test.suite.inui.ju"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.polarsys.capella.test.suite.local.ju"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.polarsys.capella.test.suite.notinui.ju"
          download-size="0"
          install-size="0"
          version="0.0.0"

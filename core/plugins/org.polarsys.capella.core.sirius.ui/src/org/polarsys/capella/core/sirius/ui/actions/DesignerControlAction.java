@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2016 THALES GLOBAL SERVICES.
+ * Copyright (c) 2006, 2017 THALES GLOBAL SERVICES.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -56,13 +56,13 @@ import org.eclipse.ui.PlatformUI;
 import org.polarsys.capella.common.ef.command.AbstractNonDirtyingCommand;
 import org.polarsys.capella.common.ef.command.AbstractReadOnlyCommand;
 import org.polarsys.capella.common.ef.command.ICommand;
+import org.polarsys.capella.common.helpers.EObjectLabelProviderHelper;
 import org.polarsys.capella.common.helpers.EcoreUtil2;
 import org.polarsys.capella.common.helpers.TransactionHelper;
 import org.polarsys.capella.common.platform.sirius.ted.SemanticEditingDomainFactory.SemanticEditingDomain;
 import org.polarsys.capella.common.tools.report.EmbeddedMessage;
 import org.polarsys.capella.common.tools.report.config.registry.ReportManagerRegistry;
 import org.polarsys.capella.common.tools.report.util.IReportManagerDefaultComponents;
-import org.polarsys.capella.common.ui.services.helper.EObjectLabelProviderHelper;
 import org.polarsys.capella.core.commands.preferences.service.AbstractPreferencesInitializer;
 import org.polarsys.capella.core.model.handler.AbortedTransactionException;
 import org.polarsys.capella.core.model.handler.helpers.RepresentationHelper;
@@ -87,7 +87,7 @@ public class DesignerControlAction extends ControlAction {
      * @param representationsDest
      */
     public CapellaSiriusControlCommand(EObject semanticRoot, URI semanticDest, Set<DRepresentationDescriptor> repDescriptors, URI representationsDest) {
-      super(semanticRoot, semanticDest, repDescriptors, representationsDest, new NullProgressMonitor());
+      super(semanticRoot, semanticDest, repDescriptors, representationsDest, true, new NullProgressMonitor());
     }
 
     /**
@@ -106,7 +106,7 @@ public class DesignerControlAction extends ControlAction {
     /**
      * Same data as eObject but I can access it without discouraged accesses.
      */
-    private EObject _semanticRoot;
+    private EObject semanticRoot;
 
     /**
      * Constructor.
@@ -114,8 +114,8 @@ public class DesignerControlAction extends ControlAction {
      * @param uncontrolRepresentations
      */
     public CapellaSiriusUncontrolCommand(EObject semanticRoot, boolean uncontrolRepresentations) {
-      super(semanticRoot, uncontrolRepresentations, new NullProgressMonitor());
-      _semanticRoot = semanticRoot;
+      super(semanticRoot, uncontrolRepresentations, true, new NullProgressMonitor());
+      this.semanticRoot = semanticRoot;
     }
 
     /**
@@ -128,12 +128,12 @@ public class DesignerControlAction extends ControlAction {
       // When specified semantic root object is detached from its own resource, no event is sent to tell it is in its parent resource.
       // Only its resource attribute is set to null with the same container (the container did not changed).
       // But when removing from its own resource has cleaned up cross referencer maps, hence fake an event to populate again cross referencers maps.
-      SemanticEditingDomain editingDomain = (SemanticEditingDomain) TransactionHelper.getEditingDomain(_semanticRoot);
+      SemanticEditingDomain editingDomain = (SemanticEditingDomain) TransactionHelper.getEditingDomain(semanticRoot);
       // Get the containing feature.
-      EStructuralFeature containingFeature = _semanticRoot.eContainmentFeature();
+      EStructuralFeature containingFeature = semanticRoot.eContainmentFeature();
       int eventType = containingFeature.isMany() ? Notification.ADD : Notification.SET;
       // Create a faked notification.
-      ENotificationImpl notification = new ENotificationImpl((InternalEObject) _semanticRoot.eContainer(), eventType, containingFeature, null, _semanticRoot);
+      ENotificationImpl notification = new ENotificationImpl((InternalEObject) semanticRoot.eContainer(), eventType, containingFeature, null, semanticRoot);
       // Broadcast the notif to Capella cross referencers.
       // FIXME It might be interesting to broadcast this faked notif to the whole eAdapters() ?
       editingDomain.getCrossReferencer().notifyChanged(notification);
@@ -166,13 +166,13 @@ public class DesignerControlAction extends ControlAction {
 
   public class CapellaSiriusControlHandler extends SiriusControlHandler {
 
-    protected Shell _shell;
+    protected Shell shell;
 
     /**
      * @param shell
      */
     public CapellaSiriusControlHandler(Shell shell) {
-      _shell = shell;
+      this.shell = shell;
     }
 
     /**
@@ -182,7 +182,7 @@ public class DesignerControlAction extends ControlAction {
     @Override
     protected ResourceDialog createControlResourceDialog(Shell shell, String defaultURI) {
       org.polarsys.capella.core.sirius.ui.internal.ControlResourceDialog controlResourceDialog =
-          new org.polarsys.capella.core.sirius.ui.internal.ControlResourceDialog(_shell, domain, _eObject.eResource(), _eObject);
+          new org.polarsys.capella.core.sirius.ui.internal.ControlResourceDialog(this.shell, domain, _eObject.eResource(), _eObject);
       return controlResourceDialog;
     }
 
@@ -205,7 +205,7 @@ public class DesignerControlAction extends ControlAction {
       if (repDescriptors.isEmpty()) {
           repDescriptorsToMove = repDescriptors;
       } else {
-          repDescriptorsToMove = askUserWhichRepresentationToSplit(_shell, session, repDescriptors);
+          repDescriptorsToMove = askUserWhichRepresentationToSplit(this.shell, session, repDescriptors);
       }
       return repDescriptorsToMove;
     }
@@ -220,9 +220,8 @@ public class DesignerControlAction extends ControlAction {
             dialog.create();
             if (Window.OK == dialog.open()) {
                 return wizard.getSelectedRepresentations();
-            } else {
-                throw new InterruptedException();
             }
+            throw new InterruptedException();
         }
         return Collections.emptySet();
     }
@@ -235,14 +234,14 @@ public class DesignerControlAction extends ControlAction {
     public void performControl(Shell shell, final EObject semanticRoot, IProgressMonitor monitor) {
       final Session session = SessionManager.INSTANCE.getSession(semanticRoot);
       if (session != null) {
-        final URI semanticDest = getControledResourceURI(_shell, semanticRoot);
+        final URI semanticDest = getControledResourceURI(this.shell, semanticRoot);
         if (semanticDest != null) {
           final Set<DRepresentationDescriptor> repDescriptors = new HashSet<DRepresentationDescriptor>(0);
           try {
-            repDescriptors.addAll(getRepresentationDescriptorsToMove(_shell, session, semanticRoot));
+            repDescriptors.addAll(getRepresentationDescriptorsToMove(this.shell, session, semanticRoot));
           } catch (InterruptedException exception) {
             StringBuilder loggerMessage = new StringBuilder(".performControl(..) _ "); //$NON-NLS-1$
-            __logger.warn(new EmbeddedMessage(loggerMessage.toString(), IReportManagerDefaultComponents.UI));
+            logger.warn(new EmbeddedMessage(loggerMessage.toString(), IReportManagerDefaultComponents.UI));
           }
           Collection<Resource> resources = new HashSet<Resource>(0);
           for (DRepresentationDescriptor repDescriptor : repDescriptors) {
@@ -277,9 +276,7 @@ public class DesignerControlAction extends ControlAction {
     @Override
     public void dispose() {
       super.dispose();
-      _shell = null;
-
-      return;
+      shell = null;
     }
 
   }
@@ -363,7 +360,7 @@ public class DesignerControlAction extends ControlAction {
     }
   }
 
-  private static final Logger __logger = ReportManagerRegistry.getInstance().subscribe(IReportManagerDefaultComponents.UI);
+  private static final Logger logger = ReportManagerRegistry.getInstance().subscribe(IReportManagerDefaultComponents.UI);
 
   /**
    * Create a new action to control the models.

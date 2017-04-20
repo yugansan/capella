@@ -61,10 +61,10 @@ import org.polarsys.capella.common.data.modellingcore.AbstractType;
 import org.polarsys.capella.common.data.modellingcore.InformationsExchanger;
 import org.polarsys.capella.common.data.modellingcore.ModelElement;
 import org.polarsys.capella.common.data.modellingcore.TraceableElement;
+import org.polarsys.capella.common.helpers.EObjectLabelProviderHelper;
 import org.polarsys.capella.common.helpers.EcoreUtil2;
 import org.polarsys.capella.common.mdsofa.common.constant.ICommonConstants;
 import org.polarsys.capella.common.sirius.decorators.loader.SiriusDecoratorsManager;
-import org.polarsys.capella.common.ui.services.helper.EObjectLabelProviderHelper;
 import org.polarsys.capella.core.data.capellacommon.State;
 import org.polarsys.capella.core.data.capellacore.Allocation;
 import org.polarsys.capella.core.data.capellacore.CapellaElement;
@@ -897,12 +897,8 @@ public class FaServices {
           }
         }
       }
-      if (!diagram.isSynchronized()) {
-        DiagramServices.getDiagramServices().removeEdgeView(anEdge);
-      } else {
-        DiagramServices.getDiagramServices().removeEdgeView(anEdge);
+      DiagramServices.getDiagramServices().removeEdgeView(anEdge);
       }
-    }
 
     // create exchange category views and remove functional exchange views
     for (DEdge anEdge : functionalExchangeEdgesToRemove) {

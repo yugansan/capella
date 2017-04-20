@@ -12,8 +12,7 @@ package org.polarsys.capella.core.ui.properties.wizards;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jface.wizard.Wizard;
-
-import org.polarsys.capella.common.ui.services.helper.EObjectLabelProviderHelper;
+import org.polarsys.capella.common.helpers.EObjectLabelProviderHelper;
 
 /**
  */

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (c) 2016, 2017 THALES GLOBAL SERVICES.
+  All rights reserved. This program and the accompanying materials
+  are made available under the terms of the Eclipse Public License v1.0
+  which accompanies this distribution, and is available at
+  http://www.eclipse.org/legal/epl-v10.html
+
+  Contributors:
+       Thales - initial API and implementation
+-->
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.polarsys</groupId>
+		<artifactId>org.polarsys.capella</artifactId>
+		<version>1.2.0-SNAPSHOT</version>
+		<relativePath>../../../</relativePath>
+	</parent>
+	<groupId>org.polarsys</groupId>
+	<artifactId>org.polarsys.capella.test.rcptt</artifactId>
+	<packaging>rcpttTest</packaging>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>rcptt-releases</id>
+			<name>RCPTT Maven repository</name>
+			<url>https://repo.eclipse.org/content/repositories/rcptt-releases/</url>
+		</pluginRepository>
+		<pluginRepository>
+			<id>rcptt-snapshots</id>
+			<name>RCPTT Maven Snapshots repository</name>
+			<snapshots>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
+			<url>https://repo.eclipse.org/content/repositories/rcptt-snapshots/</url>
+		</pluginRepository>
+	</pluginRepositories>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.eclipse.rcptt</groupId>
+				<artifactId>rcptt-maven-plugin</artifactId>
+				<version>${rcptt-version}</version>
+				<extensions>true</extensions>
+				<configuration>
+					<runner>
+						<version>${rcptt-runner-version}</version>
+						<vmArgs>
+							<vmArg>-Xmx1024m</vmArg>
+							<vmArg>-XX:MaxPermSize=512m</vmArg>
+						</vmArgs>
+					</runner>
+					<aut>
+						<explicit>../../../releng/plugins/org.polarsys.capella.rcp.product/target/products/org.polarsys.capella.rcp.product-[platform].zip</explicit>
+						<args>
+							<arg>-autArgs</arg>
+							<arg>-EPF;${project.build.directory}/User2Prefs.epf</arg>
+						</args>
+					</aut>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
