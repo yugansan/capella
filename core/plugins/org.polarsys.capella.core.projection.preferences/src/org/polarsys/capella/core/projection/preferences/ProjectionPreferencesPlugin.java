@@ -35,7 +35,7 @@ public class ProjectionPreferencesPlugin extends Plugin {
   }
 
   /**
-   * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
+   * {@inheritDoc}
    */
   @Override
   public void start(BundleContext context) throws Exception {
@@ -44,7 +44,7 @@ public class ProjectionPreferencesPlugin extends Plugin {
   }
 
   /**
-   * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
+   * {@inheritDoc}
    */
   @Override
   public void stop(BundleContext context) throws Exception {
@@ -115,20 +115,6 @@ public class ProjectionPreferencesPlugin extends Plugin {
    */
   public boolean transitionInterfaceWhileComponentTransition() {
     return new PreferenceHelper().transitionInterfaceWhileComponentTransition();
-  }
-
-  /**
-   * Returns whether the interface generation should create standard port instead of flow ports
-   */
-  public boolean generateStandardPortRatherThanFlowPort() {
-    return new PreferenceHelper().generateStandardPortRatherThanFlowPort();
-  }
-
-  /**
-   * Returns whether the interface generation should generate ports and allocate interface to ports
-   */
-  public boolean generateComponentPort() {
-    return new PreferenceHelper().generateComponentPort();
   }
 
 }
