@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2016 THALES GLOBAL SERVICES.
+ * Copyright (c) 2008, 2017 THALES GLOBAL SERVICES.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -55,6 +55,7 @@ import org.polarsys.capella.common.ef.command.AbstractReadWriteCommand;
 import org.polarsys.capella.common.mdsofa.common.helper.ExtensionPointHelper;
 import org.polarsys.kitalpha.ad.metadata.helpers.MetadataHelper;
 import org.polarsys.kitalpha.ad.metadata.helpers.ViewpointMetadata;
+import org.polarsys.kitalpha.ad.services.manager.ViewpointManager;
 
 /**
  * This class is a fork of {@link SessionFactoryImpl}.<br>
@@ -79,8 +80,8 @@ public class SiriusSessionFactory implements SessionFactory {
     final ResourceSet set = ResourceSetFactory.createFactory().createResourceSet(sessionResourceURI);
     final TransactionalEditingDomain transactionalEditingDomain = EditingDomainFactoryService.INSTANCE.getEditingDomainFactory().createEditingDomain(set);
 
-    // Configure the resource set, its is done here and not before the
     // editing domain creation which could provide its own resource set.
+    // Configure the resource set, its is done here and not before the
     if (Movida.isEnabled()) {
       transactionalEditingDomain.getResourceSet().setURIConverter(
           new ViewpointURIConverter((ViewpointRegistry) org.eclipse.sirius.business.api.componentization.ViewpointRegistry.getInstance()));
@@ -104,6 +105,23 @@ public class SiriusSessionFactory implements SessionFactory {
     return session;
   }
 
+  private void checkMetadata(URI sessionResourceURI, ResourceSet set) {
+	if (sessionResourceURI.isPlatform()) {
+	  if (!ViewpointManager.getInstance(set).hasMetadata()) {
+	    throw new NoMetadataException(MetadataHelper.getViewpointMetadata(set).getExpectedMetadataStorageURI().toPlatformString(true));
+	  }
+
+	  IStatus result = ViewpointManager.checkViewpointsCompliancy(set);
+	  if (!result.isOK()) {
+	    IStatus capella = ViewpointManager.checkViewpointCompliancy(set, PlatformSiriusTedActivator.CAPELLA_VIEWPOINT_ID);
+	    if (!capella.isOK()) {
+	      throw new WrongCapellaVersionException(capella);
+	    }
+	    throw new MetadataException(result);
+	  }
+	}
+  }
+
   protected Session loadSessionModelResource(URI sessionResourceURI, final TransactionalEditingDomain transactionalEditingDomain, IProgressMonitor monitor)
       throws CoreException {
     ResourceSet resourceSet = transactionalEditingDomain.getResourceSet();
@@ -115,6 +133,7 @@ public class SiriusSessionFactory implements SessionFactory {
       monitor.beginTask("Session loading", 4);
       // Get resource
       final Resource sessionModelResource = resourceSet.getResource(sessionResourceURI, true);
+      checkMetadata(sessionResourceURI, resourceSet);
       if (sessionModelResource != null) {
         DAnalysis analysis = null;
         if (!sessionModelResource.getContents().isEmpty() && (sessionModelResource.getContents().get(0) instanceof DAnalysis)) {
