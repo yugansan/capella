@@ -441,6 +441,20 @@
 					</snapshots>
 				</pluginRepository>
 			</pluginRepositories>
+	</profile>
+	<profile>
+			<id>addons</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<properties>
+				<packagedSiteName>org.polarsys.capella.addons</packagedSiteName>
+				<target-platform-path>addons</target-platform-path>
+			</properties>
+			<modules>
+				<module>addons</module>
+				<module>releng/plugins/org.polarsys.capella.addons.site</module>
+			</modules>
 		</profile>
 	</profiles>
 </project>

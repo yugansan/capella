@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright (c) 2017 THALES GLOBAL SERVICES.
+    All rights reserved. This program and the accompanying materials
+    are made available under the terms of the Eclipse Public License v1.0
+    which accompanies this distribution, and is available at
+    http://www.eclipse.org/legal/epl-v10.html
+      
+    Contributors:
+       Thales - initial API and implementation
+ -->
+<site>
+   <feature id="org.polarsys.capella.core.re.project.feature" version="1.2.0.qualifier">
+      <category name="org.polarsys.capella.addon.category"/>
+   </feature>
+   <feature id="org.polarsys.capella.core.re.project.feature.source" version="1.2.0.qualifier">
+     <category name="org.polarsys.capella.addon.category"/>
+   </feature>
+   <category-def name="org.polarsys.capella.addon.category" label="Capella Rec Project Addon">
+      <description>
+        Adds the ability to create and instantiate a REC of an entire Capella Project
+      </description>
+   </category-def>
+</site>

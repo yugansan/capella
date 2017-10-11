@@ -74,50 +74,14 @@
 				</configuration>
 				<executions>
 					<execution>
-						<id>generate.canary.target</id>
-						<phase>validate</phase>
-						<configuration>
-							<applicationsArgs>
-								<args>-application ${converterApplication.name} canary/${targetPlatform.name}</args>
-							</applicationsArgs>
-						</configuration>
-						<goals>
-							<goal>eclipse-run</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>generate.full.target</id>
-						<phase>validate</phase>
-						<configuration>
-							<applicationsArgs>
-								<args>-application ${converterApplication.name} full/${targetPlatform.name}</args>
-							</applicationsArgs>
-						</configuration>
-						<goals>
-							<goal>eclipse-run</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>generate.headless.target</id>
+						<id>generate.addons.target</id>
 						<phase>validate</phase>
 						<goals>
 							<goal>eclipse-run</goal>
 						</goals>
 						<configuration>
 							<applicationsArgs>
-								<args>-application ${converterApplication.name} headless/${targetPlatform.name}</args>
-							</applicationsArgs>
-						</configuration>
-					</execution>
-					<execution>
-						<id>generate.nightly.target</id>
-						<phase>validate</phase>
-						<goals>
-							<goal>eclipse-run</goal>
-						</goals>
-						<configuration>
-							<applicationsArgs>
-								<args>-application ${converterApplication.name} nightly/${targetPlatform.name}</args>
+								<args>-application ${converterApplication.name} addons/${targetPlatform.name}</args>
 							</applicationsArgs>
 						</configuration>
 					</execution>
