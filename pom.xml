@@ -23,8 +23,8 @@
 		<tycho-version>1.0.0</tycho-version>
 		<tycho-extras-version>1.0.0</tycho-extras-version>
 		<antrun-version>1.7</antrun-version>
-		<rcptt-version>2.1.0</rcptt-version>
-		<rcptt-runner-version>2.1.0</rcptt-runner-version>
+		<rcptt-version>2.2.0</rcptt-version>
+		<rcptt-runner-version>2.2.0</rcptt-runner-version>
 		<sonar-version>3.0.2</sonar-version>
 		<jacoco-version>0.7.4.201502262128</jacoco-version>
 
