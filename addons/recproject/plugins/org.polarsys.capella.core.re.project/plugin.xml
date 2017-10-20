@@ -16,7 +16,7 @@
          point="org.eclipse.ui.commands">
       <command
             categoryId="org.polarsys.capella.common.re.subcommands"
-            defaultHandler="org.polarsys.capella.core.re.project.handlers.CreateRECProjectHandler"
+            defaultHandler="org.polarsys.capella.core.re.project.handlers.CreateProjectRecHandler"
             id="org.polarsys.capella.core.re.project.createREC"
             name="Create REC from Project">
       </command>
@@ -34,6 +34,29 @@
             </visibleWhen>
          </command>
       </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      
+      <!-- this overrides the standard create rec handler in the most ridiculous way possible 
+      <handler
+            class="org.polarsys.capella.core.re.project.handlers.CreateProjectReplicaHandler"
+            commandId="org.polarsys.capella.common.re.createReplica">
+             <activeWhen>
+             <and>
+                <test forcePluginActivation="true" property="org.polarsys.capella.core.re.activation" value="true" />
+                <reference definitionId="org.polarsys.capella.core.isInCapellaContext" />
+                <with
+                      variable="activeWorkbenchWindow.activePerspective">
+                   <not>
+                      <equals
+                            value="yoda">
+                      </equals>
+                   </not>
+                </with>
+            </and>
+         </activeWhen>
+      </handler> -->
    </extension>
 
 

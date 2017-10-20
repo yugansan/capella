@@ -45,7 +45,7 @@ import org.polarsys.capella.core.re.commands.CreateRecCommand;
 import org.polarsys.capella.core.re.project.ReProjectActivator;
 import org.polarsys.capella.core.re.project.diffmerge.SkeletonMatchPolicy;
 
-public class CreateRECProjectHandler extends AbstractHandler {
+public class CreateProjectRecHandler extends AbstractHandler {
 
   @Override
   public Object execute(ExecutionEvent event) throws ExecutionException {
