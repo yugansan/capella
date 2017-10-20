@@ -10,9 +10,11 @@
  *******************************************************************************/
 package org.polarsys.capella.common.re.handlers.location;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 
 import org.eclipse.core.runtime.IStatus;
@@ -22,6 +24,7 @@ import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.polarsys.capella.common.flexibility.properties.schema.IProperty;
 import org.polarsys.capella.common.flexibility.properties.schema.IPropertyContext;
+import org.polarsys.capella.common.re.Activator;
 import org.polarsys.capella.common.re.CatalogElement;
 import org.polarsys.capella.common.re.CatalogElementLink;
 import org.polarsys.capella.common.re.constants.IReConstants;
@@ -365,13 +368,59 @@ public class DefaultLocationHandler implements ILocationHandler {
     Collection<EObject> elementsContainers = new LinkedHashSet<EObject>(); // order is important!
 
     retrieveDefaultContainersForComposite(link, elementsContainers, context);
-    retrieveDefaultContainersFromSelection(link, oppositeLink, elementsContainers, context);
-    retrieveDefaultContainersFromSiblingLinks(link, elementsContainers, context);
-    retrieveDefaultContainersFromLocationSourceProperty(link, elementsContainers, context);
+
+    String parentLocator = getParentLocator(context);
+    if (IReConstants.LOCATOR_OPTION_DEFAULT.equals(parentLocator) || IReConstants.LOCATOR_OPTION_MANUAL.equals(parentLocator)) {
+
+      retrieveDefaultContainersFromSelection(link, oppositeLink, elementsContainers, context);
+      retrieveDefaultContainersFromSiblingLinks(link, elementsContainers, false, context);
+
+    } else if (IReConstants.LOCATOR_OPTION_SPECIFIC_PACKAGES.equals(parentLocator)){
+
+      String command = (String) context.get(IReConstants.COMMAND__CURRENT_VALUE);
+      if (IReConstants.COMMAND__CREATE_A_REPLICA_FROM_REPLICABLE.equals(command)) {
+        retrieveDefaultSpecificPackageContainer(link, oppositeLink, elementsContainers, context);
+        retrieveDefaultContainersFromSelection(link, oppositeLink, elementsContainers, context);
+        retrieveDefaultContainersFromSiblingLinks(link, elementsContainers, true, context);
+      }
+
+      if (IReConstants.COMMAND__UPDATE_A_REPLICA_FROM_REPLICABLE.equals(command)) {
+        retrieveDefaultContainersFromSiblingLinks(link, elementsContainers, true, context);
+        retrieveDefaultSpecificPackageContainer(link, oppositeLink, elementsContainers, context);
+        retrieveDefaultContainersFromSelection(link, oppositeLink, elementsContainers, context);
+      }
+
+    }
+
+    retrieveDefaultContainersFromLocationSourceProperty(oppositeLink, elementsContainers, context);
 
     return elementsContainers;
   }
 
+  private void retrieveDefaultSpecificPackageContainer(CatalogElementLink link, CatalogElementLink oppositeLink, Collection<EObject> elementsContainers, IContext context) {
+    EObject pkg = getSpecificPackage(link, oppositeLink, context);
+    if (pkg != null) {
+      elementsContainers.add(pkg);
+    }
+  }
+
+  private String getParentLocator(IContext context) {
+    String scope = (String) context.get(ITransitionConstants.OPTIONS_SCOPE);
+    IPropertyContext propertyContext = ((IPropertyHandler) OptionsHandlerHelper.getInstance(context)).getPropertyContext(context, scope);
+    IProperty parentLocatorProperty = propertyContext.getProperties().getProperty(IReConstants.PROPERTY__PARENT_LOCATOR);
+
+    String result = IReConstants.LOCATOR_OPTION_DEFAULT;
+    if (parentLocatorProperty == null) {
+      Activator.getDefault().getLog().log(new Status(IStatus.WARNING, Activator.PLUGIN_ID, String.format("Expected property '%s' is not available in this context'", IReConstants.PROPERTY__PARENT_LOCATOR))); //$NON-NLS-1$
+    } else {
+      result = (String) propertyContext.getCurrentValue(parentLocatorProperty);
+    }
+    return result;
+  }
+
+  protected EObject getSpecificPackage(CatalogElementLink link, CatalogElementLink oppositeLink, IContext context) {
+    return null;
+  }
 
   // We also add for a CatalogElementLink to a CatalogElement, link.getSource().eContainer()
   private void retrieveDefaultContainersFromLocationSourceProperty(CatalogElementLink link, Collection<EObject> elementsContainers,
@@ -404,11 +453,14 @@ public class DefaultLocationHandler implements ILocationHandler {
     }
   }
 
+  // We look for a Link of a brother of linkSource (same eContainer) in the target, and then, we retrieve its container,
+  // optionally preferring those that have the same target element type
   private void retrieveDefaultContainersFromSiblingLinks(CatalogElementLink link, Collection<EObject> elementsContainers,
-      IContext context) {
-    // We look for a Link of a brother of linkSource (same eContainer) in the target, and then, we retrieve its container
+      boolean preferSameType, IContext context) {
     CatalogElement element = ReplicableElementHandlerHelper.getInstance(context).getInitialTarget(context);
     Collection<CatalogElementLink> links = ReplicableElementHandlerHelper.getInstance(context).getElementsLinks(element);
+
+    Collection<EObject> siblings = new ArrayList<EObject>();
 
     for (CatalogElementLink linkA : links) {
       if ((linkA == null) || ((linkA.getOrigin() == null) || (linkA.getOrigin().getTarget() == null)) || (linkA.getOrigin().getTarget().eContainer() == null)) {
@@ -423,9 +475,24 @@ public class DefaultLocationHandler implements ILocationHandler {
       if (!linkA.getOrigin().getTarget().eContainer().equals(link.getOrigin().getTarget().eContainer())) {
         continue; // not a brother
       }
-
-      elementsContainers.add(linkA.getTarget().eContainer()); // retrieve the container
+      siblings.add(linkA.getTarget());
     }
+
+
+    if (preferSameType) {
+      for (Iterator<EObject> it = siblings.iterator(); it.hasNext(); ) {
+        EObject next = it.next();
+        if (next.eClass() == link.getTarget().eClass()) {
+          it.remove();
+          elementsContainers.add(next.eContainer());
+        }
+      }
+    }
+
+    for (EObject e : siblings) {
+      elementsContainers.add(e.eContainer());
+    }
+
   }
 
 

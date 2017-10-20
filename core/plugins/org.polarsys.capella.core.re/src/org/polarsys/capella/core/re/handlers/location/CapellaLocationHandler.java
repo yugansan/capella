@@ -1,21 +1,26 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2014 THALES GLOBAL SERVICES.
+ * Copyright (c) 2006, 2017 THALES GLOBAL SERVICES.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *  
+ *
  * Contributors:
  *    Thales - initial API and implementation
  *******************************************************************************/
 package org.polarsys.capella.core.re.handlers.location;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.polarsys.capella.common.re.CatalogElement;
 import org.polarsys.capella.common.re.CatalogElementLink;
 import org.polarsys.capella.common.re.handlers.location.DefaultLocationHandler;
 import org.polarsys.capella.core.data.cs.AbstractActor;
@@ -26,6 +31,24 @@ import org.polarsys.capella.core.re.handlers.attributes.CapellaMoveHelper;
 import org.polarsys.kitalpha.transposer.rules.handler.rules.api.IContext;
 
 public class CapellaLocationHandler extends DefaultLocationHandler {
+
+  final Collection<SpecificPackageLocationAdapter> adapters = new ArrayList<SpecificPackageLocationAdapter>();
+
+
+  protected EObject getSpecificPackage(CatalogElementLink link, CatalogElementLink oppositeLink, IContext context) {
+
+    CatalogElement rpl = link.getSource();
+    SpecificPackageLocationAdapter adapter = (SpecificPackageLocationAdapter) EcoreUtil.getExistingAdapter(rpl, SpecificPackageLocationAdapter.class);
+
+    if (adapter == null) {
+      adapter = new SpecificPackageLocationAdapter();
+      rpl.eAdapters().add(adapter);
+      adapters.add(adapter);
+    }
+
+    return adapter.getSpecificPackage(link.getTarget());
+
+  }
 
   /**
    * {@inheritDoc}
@@ -72,4 +95,13 @@ public class CapellaLocationHandler extends DefaultLocationHandler {
     }
     return super.isInitialSelectionValidContainer(selection_p, link_p, context_p);
   }
+
+  @Override
+  public IStatus dispose(IContext context) {
+    for (SpecificPackageLocationAdapter a : adapters) {
+      a.dispose();
+    }
+    return Status.OK_STATUS;
+  }
+
 }

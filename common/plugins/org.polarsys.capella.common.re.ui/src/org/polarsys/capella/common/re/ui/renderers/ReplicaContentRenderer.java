@@ -1,10 +1,10 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2016 THALES GLOBAL SERVICES.
+ * Copyright (c) 2006, 2017 THALES GLOBAL SERVICES.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *  
+ *
  * Contributors:
  *    Thales - initial API and implementation
  *******************************************************************************/
@@ -252,14 +252,20 @@ public class ReplicaContentRenderer extends EditListRenderer implements Property
       }
       location = LocationHandlerHelper.getInstance(ctx).getLocation(link, link.getOrigin(), ctx);
       if (location == null) {
-        EObject defaultLocation = LocationHandlerHelper.getInstance(ctx).getDefaultLocation(link, link.getOrigin(), ctx);
 
-        Object value =
+        Object parentLocator =
             context.getPropertyContext().getCurrentValue(
-                context.getPropertyContext().getProperties().getProperty(IReConstants.PROPERTY__USE_DEFAULT_LOCATION));
-        if (Boolean.FALSE.equals(value) || (defaultLocation == null)) {
+                context.getPropertyContext().getProperties().getProperty(IReConstants.PROPERTY__PARENT_LOCATOR));
+
+        EObject defaultLocation = null;
+        if (!IReConstants.LOCATOR_OPTION_MANUAL.equals(parentLocator)) {
+          defaultLocation = LocationHandlerHelper.getInstance(ctx).getDefaultLocation(link, link.getOrigin(), ctx);
+        }
+
+        if (defaultLocation == null) {
           return new Status(IStatus.WARNING, "  ", "no location");
         }
+
         return new Status(IStatus.INFO, "  ", "default location");
       }
     }
