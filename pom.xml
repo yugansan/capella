@@ -448,6 +448,7 @@
 				<activeByDefault>false</activeByDefault>
 			</activation>
 			<properties>
+			        <patchQualifier>'RECPKG_'yyyyMMddHHmm</patchQualifier>
 				<packagedSiteName>org.polarsys.capella.addons</packagedSiteName>
 				<target-platform-path>addons</target-platform-path>
 			</properties>

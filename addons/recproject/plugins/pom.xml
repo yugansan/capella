@@ -14,7 +14,7 @@
 	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.polarsys.capella</groupId>
-	<artifactId>org.polarsys.capella.addons.recproject.feature</artifactId>
+	<artifactId>org.polarsys.capella.addons.recproject.plugins</artifactId>
 	<version>1.2.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<parent>
@@ -26,6 +26,10 @@
 	
 	<modules>
 	  <module>org.polarsys.capella.core.re.project</module>
+	  <module>org.polarsys.capella.re-dummy</module>
+	  <module>../../../common/plugins/org.polarsys.capella.common.re</module>
+	  <module>../../../common/plugins/org.polarsys.capella.common.re.ui</module>
+	  <module>../../../core/plugins/org.polarsys.capella.core.re</module>
 	</modules>
 	
 </project>

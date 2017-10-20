@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.polarsys.capella.core.re.recpkg-patch.feature"
+      label="%featureName"
+      provider-name="%providerName"
+      version="1.2.0.qualifier">
+
+   <description>
+      %featureDescription
+   </description>
+
+   <copyright>
+      %copyright
+   </copyright>
+
+   <license url="%licenseURL">
+      %license
+   </license>
+
+   <requires>
+      <import feature="org.polarsys.capella.core.re.feature" version="1.2.0.201710091310" patch="true"/>
+   </requires>
+
+   <plugin
+         id="org.polarsys.capella.core.re"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>

@@ -28,8 +28,80 @@
 	</properties>
 
 	<build>
-		<plugins>
+	  <plugins>
+	    <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>target-platform-configuration</artifactId>
+        <configuration>
+          <dependency-resolution>
+            <extraRequirements>
+             <!-- this guarantees proper inclusion in reactor-->
+              <requirement>
+                <type>eclipse-feature</type>
+                <id>org.polarsys.capella.core.re.feature</id>
+                <versionRange>1.2.0.201710091310</versionRange>
+              </requirement>
+	      <requirement>
+                <type>eclipse-feature</type>
+                <id>org.polarsys.capella.common.feature</id>
+                <versionRange>1.2.0.201710091310</versionRange>
+              </requirement>
+	      <requirement>
+                <type>eclipse-feature</type>
+                <id>org.polarsys.capella.common.ui.feature</id>
+                <versionRange>1.2.0.201710091310</versionRange>
+              </requirement>
+	      <requirement>
+                <type>eclipse-plugin</type>
+                <id>org.polarsys.capella.core.re</id>
+		<versionRange>1.2</versionRange>
+              </requirement>
+	      <requirement>
+                <type>eclipse-plugin</type>
+                <id>org.polarsys.capella.common.re</id>
+		<versionRange>1.2</versionRange>
+              </requirement>
+	      <requirement>
+                <type>eclipse-plugin</type>
+                <id>org.polarsys.capella.common.re.ui</id>
+		<versionRange>1.2</versionRange>
+              </requirement>
+            </extraRequirements>
+          </dependency-resolution>
+        </configuration>
+
+	    </plugin>
+		
 			<plugin>
+				<groupId>org.jboss.tools.tycho-plugins</groupId>
+				<artifactId>repository-utils</artifactId>
+				<version>0.26.1</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>generate-repository-facade</goal>
+						</goals>
+						<configuration>
+							<!-- customize generated index.html -->
+							<siteTemplateFolder>siteTemplate</siteTemplateFolder>
+							<symbols>
+								<update.site.version>${qualifiedVersion}</update.site.version>
+								<update.site.name>Capella RecProject Update Site</update.site.name>
+								<target.capella.version>1.2.0</target.capella.version>
+								<update.site.description>Update site for Capella RecProject</update.site.description>
+							</symbols>
+							<!-- the feature patches and source features are not categorized and we don't want to show them
+							      in tycho's "Uncategorized" category -->
+							<removeDefaultCategory>true</removeDefaultCategory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+
+	    
+		  <plugin>
 			  <groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-antrun-plugin</artifactId>
 				<version>1.7</version>
@@ -65,6 +137,16 @@
 			</plugin>
 		</plugins>
 	</build>
+
+
+	
+	<pluginRepositories>
+		<pluginRepository>
+			<id>jboss-repository</id>
+			<name>JBoss Repository</name>
+			<url>http://repository.jboss.org/nexus/content/repositories/releases/</url>
+		</pluginRepository>
+	</pluginRepositories>
 
 	
 

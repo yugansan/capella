@@ -1,24 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-    Copyright (c) 2017 THALES GLOBAL SERVICES.
-    All rights reserved. This program and the accompanying materials
-    are made available under the terms of the Eclipse Public License v1.0
-    which accompanies this distribution, and is available at
-    http://www.eclipse.org/legal/epl-v10.html
-      
-    Contributors:
-       Thales - initial API and implementation
- -->
 <site>
-   <feature id="org.polarsys.capella.core.re.project.feature" version="1.2.0.qualifier">
+   <feature id="org.polarsys.capella.addon.recproject.feature" version="0.0.0">
       <category name="org.polarsys.capella.addon.category"/>
    </feature>
-   <feature id="org.polarsys.capella.core.re.project.feature.source" version="1.2.0.qualifier">
-     <category name="org.polarsys.capella.addon.category"/>
+   <feature id="org.polarsys.capella.addon.recpkg.feature" version="0.0.0">
+      <category name="org.polarsys.capella.addon.category"/>
    </feature>
-   <category-def name="org.polarsys.capella.addon.category" label="Capella Rec Project Addon">
+    <feature id="org.polarsys.capella.addon.recproject.feature.source" version="0.0.0">
+      <category name="org.polarsys.capella.addon.source.category"/>
+   </feature>
+   <feature id="org.polarsys.capella.addon.recpkg.feature.source" version="0.0.0">
+      <category name="org.polarsys.capella.addon.source.category"/>
+   </feature>
+   <feature id="org.polarsys.capella.core.re.recpkg-patch.feature" version="0.0.0" patch="true"/>
+   <feature id="org.polarsys.capella.common.recpkg-patch.feature" version="0.0.0" patch="true"/>
+   <feature id="org.polarsys.capella.common.ui.recpkg-patch.feature" version="0.0.0" patch="true"/>
+   <feature id="org.polarsys.capella.core.re.recpkg-patch.feature.source" version="0.0.0"/>
+   <feature id="org.polarsys.capella.common.recpkg-patch.feature.source" version="0.0.0"/>
+   <feature id="org.polarsys.capella.common.ui.recpkg-patch.feature.source" version="0.0.0"/>
+   <category-def name="org.polarsys.capella.addon.category" label="Capella REC Project and Package Addons">
       <description>
-        Adds the ability to create and instantiate a REC of an entire Capella Project
+        Provides addons to create REC from project and to locate RPL elements in specific packages
+      </description>
+   </category-def>
+   <category-def name="org.polarsys.capella.addon.source.category" label="Source code for Capella REC Project and Package Addons (Optional)">
+      <description>
+        Provides source code for Capella REC Project and Package Addons. Installation is optional.
       </description>
    </category-def>
 </site>
