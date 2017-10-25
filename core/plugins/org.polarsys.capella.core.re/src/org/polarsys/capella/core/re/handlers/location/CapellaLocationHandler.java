@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.polarsys.capella.common.flexibility.properties.schema.IPropertyContext;
 import org.polarsys.capella.common.re.CatalogElement;
 import org.polarsys.capella.common.re.CatalogElementLink;
 import org.polarsys.capella.common.re.handlers.location.DefaultLocationHandler;
@@ -29,6 +30,9 @@ import org.polarsys.capella.core.data.cs.Component;
 import org.polarsys.capella.core.data.cs.Part;
 import org.polarsys.capella.core.model.helpers.move.MoveHelper;
 import org.polarsys.capella.core.re.handlers.attributes.CapellaMoveHelper;
+import org.polarsys.capella.core.transition.common.constants.ITransitionConstants;
+import org.polarsys.capella.core.transition.common.handlers.options.IPropertyHandler;
+import org.polarsys.capella.core.transition.common.handlers.options.OptionsHandlerHelper;
 import org.polarsys.kitalpha.transposer.rules.handler.rules.api.IContext;
 
 public class CapellaLocationHandler extends DefaultLocationHandler {
@@ -42,7 +46,11 @@ public class CapellaLocationHandler extends DefaultLocationHandler {
     SpecificPackageLocationAdapter adapter = (SpecificPackageLocationAdapter) EcoreUtil.getExistingAdapter(rpl, SpecificPackageLocationAdapter.class);
 
     if (adapter == null) {
-      adapter = new SpecificPackageLocationAdapter();
+
+      String scope = (String) context.get(ITransitionConstants.OPTIONS_SCOPE);
+      IPropertyContext propertyContext = ((IPropertyHandler) OptionsHandlerHelper.getInstance(context)).getPropertyContext(context, scope);
+      adapter = new SpecificPackageLocationAdapter(propertyContext);
+
       rpl.eAdapters().add(adapter);
       adapters.add(adapter);
     }

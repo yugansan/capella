@@ -18,11 +18,34 @@ import java.util.function.Supplier;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.impl.AdapterImpl;
 import org.eclipse.emf.ecore.EObject;
+import org.polarsys.capella.common.flexibility.properties.PropertyChangeListener;
+import org.polarsys.capella.common.flexibility.properties.PropertyChangedEvent;
+import org.polarsys.capella.common.flexibility.properties.schema.IPropertyContext;
 import org.polarsys.capella.common.re.CatalogElement;
 import org.polarsys.capella.common.re.RePackage;
+import org.polarsys.capella.common.re.constants.IReConstants;
 import org.polarsys.capella.core.data.capellacore.NamedElement;
 
 class SpecificPackageLocationAdapter extends AdapterImpl {
+
+  SpecificPackageLocationAdapter(IPropertyContext context) {
+
+    // The name isn't set on the RPL CatalogElement EObject until the wizard
+    // finishes so we must listen to property changes too
+    context.registerListener(new PropertyChangeListener() {
+      @Override
+      public void update(PropertyChangedEvent event) {
+        if (IReConstants.PROPERTY__TARGET_NAME.equals(event.getProperty().getId())) {
+          for (EObject pkg : created) {
+            if (pkg instanceof NamedElement) {
+              ((NamedElement) pkg).setName((String)context.getCurrentValue(event.getProperty()));
+            }
+          }
+        }
+      }
+    });
+
+  }
 
   /**
    * Stores all created packages so we can delete empty ones on disposal
