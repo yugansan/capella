@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -34,8 +35,8 @@ public class CapellaLocationHandler extends DefaultLocationHandler {
 
   final Collection<SpecificPackageLocationAdapter> adapters = new ArrayList<SpecificPackageLocationAdapter>();
 
-
-  protected EObject getSpecificPackage(CatalogElementLink link, CatalogElementLink oppositeLink, IContext context) {
+  @Override
+  protected Supplier<EObject> getSpecificPackage(CatalogElementLink link, CatalogElementLink oppositeLink, IContext context) {
 
     CatalogElement rpl = link.getSource();
     SpecificPackageLocationAdapter adapter = (SpecificPackageLocationAdapter) EcoreUtil.getExistingAdapter(rpl, SpecificPackageLocationAdapter.class);

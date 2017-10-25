@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.function.Supplier;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -41,6 +42,7 @@ import org.polarsys.kitalpha.transposer.rules.handler.exceptions.possibilities.M
 import org.polarsys.kitalpha.transposer.rules.handler.rules.api.IContext;
 import org.polarsys.kitalpha.transposer.rules.handler.rules.api.IRule;
 import org.polarsys.kitalpha.transposer.rules.handler.rules.common.MappingPossibility;
+
 
 public class DefaultLocationHandler implements ILocationHandler {
 
@@ -267,13 +269,12 @@ public class DefaultLocationHandler implements ILocationHandler {
       return defaultLocations.get(link);
     }
 
-    // Retrieve default containers
-    Collection<EObject> elementsContainers = retrieveDefaultContainers(link, oppositeLink, context);
-
     // Now we are looking for a feature according to related rule and if we can add element to one of the retrieve possible container, we return it
     IRuleAttachment arule = getRule(link.getTarget(), context);
 
-    for (EObject targetContainer : elementsContainers) {
+    for (Iterator<EObject> elementsContainers = retrieveDefaultContainers(link, oppositeLink, context); elementsContainers.hasNext();) {
+
+      EObject targetContainer = elementsContainers.next();
 
       // If REC and RPL are not located in the same resource, we exclude all containers not located in the targetElement's resource.
       if (isInvalidResourceLocation(link, targetContainer, context)) {
@@ -363,10 +364,9 @@ public class DefaultLocationHandler implements ILocationHandler {
   }
 
 
-  protected Collection<EObject> retrieveDefaultContainers(CatalogElementLink link, CatalogElementLink oppositeLink, IContext context) {
+  protected Iterator<EObject> retrieveDefaultContainers(CatalogElementLink link, CatalogElementLink oppositeLink, IContext context) {
 
-    Collection<EObject> elementsContainers = new LinkedHashSet<EObject>(); // order is important!
-
+    Collection<Object> elementsContainers = new LinkedHashSet<Object>(); // order is important!
     retrieveDefaultContainersForComposite(link, elementsContainers, context);
 
     String parentLocator = getParentLocator(context);
@@ -394,13 +394,43 @@ public class DefaultLocationHandler implements ILocationHandler {
 
     retrieveDefaultContainersFromLocationSourceProperty(oppositeLink, elementsContainers, context);
 
-    return elementsContainers;
+    return retrieveDefaultContainersIterator(elementsContainers);
   }
 
-  private void retrieveDefaultSpecificPackageContainer(CatalogElementLink link, CatalogElementLink oppositeLink, Collection<EObject> elementsContainers, IContext context) {
-    EObject pkg = getSpecificPackage(link, oppositeLink, context);
-    if (pkg != null) {
-      elementsContainers.add(pkg);
+  private Iterator<EObject> retrieveDefaultContainersIterator(Collection<?> containersAndSuppliers){
+
+    final Iterator<?> nested = containersAndSuppliers.iterator();
+    Iterator<EObject> result = new Iterator<EObject>() {
+      @Override
+      public boolean hasNext() {
+        return nested.hasNext();
+      }
+
+      @Override
+      public EObject next() {
+        Object next = nested.next();
+        if (next instanceof EObject) {
+          return (EObject) next;
+        }
+        if (next instanceof Supplier<?>) {
+          return ((Supplier<EObject>) next).get();
+        }
+        return null;
+      }
+
+      @Override
+      public void remove() {
+        nested.remove();
+      }
+    };
+    return result;
+  }
+
+
+  private void retrieveDefaultSpecificPackageContainer(CatalogElementLink link, CatalogElementLink oppositeLink, Collection<? super Supplier<EObject>> elementsContainers, IContext context) {
+    Supplier<EObject> pkgSupplier = getSpecificPackage(link, oppositeLink, context);
+    if (pkgSupplier != null) {
+      elementsContainers.add(pkgSupplier);
     }
   }
 
@@ -418,12 +448,12 @@ public class DefaultLocationHandler implements ILocationHandler {
     return result;
   }
 
-  protected EObject getSpecificPackage(CatalogElementLink link, CatalogElementLink oppositeLink, IContext context) {
+  protected Supplier<EObject> getSpecificPackage(CatalogElementLink link, CatalogElementLink oppositeLink, IContext context) {
     return null;
   }
 
   // We also add for a CatalogElementLink to a CatalogElement, link.getSource().eContainer()
-  private void retrieveDefaultContainersFromLocationSourceProperty(CatalogElementLink link, Collection<EObject> elementsContainers,
+  private void retrieveDefaultContainersFromLocationSourceProperty(CatalogElementLink link, Collection<? super EObject> elementsContainers,
       IContext context) {
     String scope = (String) context.get(ITransitionConstants.OPTIONS_SCOPE);
     IPropertyContext propertyContext = ((IPropertyHandler) OptionsHandlerHelper.getInstance(context)).getPropertyContext(context, scope);
@@ -455,7 +485,7 @@ public class DefaultLocationHandler implements ILocationHandler {
 
   // We look for a Link of a brother of linkSource (same eContainer) in the target, and then, we retrieve its container,
   // optionally preferring those that have the same target element type
-  private void retrieveDefaultContainersFromSiblingLinks(CatalogElementLink link, Collection<EObject> elementsContainers,
+  private void retrieveDefaultContainersFromSiblingLinks(CatalogElementLink link, Collection<? super EObject> elementsContainers,
       boolean preferSameType, IContext context) {
     CatalogElement element = ReplicableElementHandlerHelper.getInstance(context).getInitialTarget(context);
     Collection<CatalogElementLink> links = ReplicableElementHandlerHelper.getInstance(context).getElementsLinks(element);
@@ -498,7 +528,7 @@ public class DefaultLocationHandler implements ILocationHandler {
 
   // We look in the selection if there is a compatible element to store the linkSource (the rack when instanciating the card)
   private void retrieveDefaultContainersFromSelection(CatalogElementLink link, CatalogElementLink oppositeLink,
-      Collection<EObject> elementsContainers, IContext context) {
+      Collection<? super EObject> elementsContainers, IContext context) {
     Collection<EObject> elements = (Collection<EObject>) context.get(ITransitionConstants.TRANSITION_SOURCES);
     if (elements != null) {
       for (EObject ppp : elements) {
@@ -528,7 +558,7 @@ public class DefaultLocationHandler implements ILocationHandler {
     }
   }
 
-  private void retrieveDefaultContainersForComposite(CatalogElementLink link, Collection<EObject> elementsContainers,
+  private void retrieveDefaultContainersForComposite(CatalogElementLink link, Collection<? super EObject> elementsContainers,
       IContext context) {
     CatalogElement element = ReplicableElementHandlerHelper.getInstance(context).getInitialTarget(context);
 

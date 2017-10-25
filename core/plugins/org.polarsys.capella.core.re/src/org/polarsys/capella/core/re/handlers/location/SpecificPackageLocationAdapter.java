@@ -13,6 +13,7 @@ package org.polarsys.capella.core.re.handlers.location;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.function.Supplier;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.impl.AdapterImpl;
@@ -32,7 +33,7 @@ class SpecificPackageLocationAdapter extends AdapterImpl {
   /**
    * The factory that actually creates the packages for this adapter.
    */
-  SpecificPackageFactory factory = new SpecificPackageFactory();
+  SpecificPackageSupplierFactory factory = new SpecificPackageSupplierFactory();
 
   @Override
   public void notifyChanged(Notification msg) {
@@ -49,15 +50,23 @@ class SpecificPackageLocationAdapter extends AdapterImpl {
    * Get the specific package in which the packagedElement should be stored
    * @param packagedElement
    */
-  public EObject getSpecificPackage(EObject packagedElement) {
-    EObject pkg = factory.getSpecificPackage(packagedElement);
-    if (pkg != null) {
-      created.add(pkg);
-      if (pkg instanceof NamedElement) {
-        ((NamedElement) pkg).setName(((CatalogElement)getTarget()).getName());
-      }
+  public Supplier<EObject> getSpecificPackage(EObject packagedElement) {
+    Supplier<EObject> result = null;
+    final Supplier<EObject> pkgSupplier = factory.getSpecificPackageSupplier(packagedElement);
+    if (pkgSupplier != null) {
+      result = new Supplier<EObject>() {
+        @Override
+        public EObject get() {
+          EObject pkg = pkgSupplier.get();
+          created.add(pkg);
+          if (pkg instanceof NamedElement) {
+            ((NamedElement) pkg).setName(((CatalogElement)getTarget()).getName());
+          }
+          return pkg;
+        }
+      };
     }
-    return pkg;
+    return result;
   }
 
   /**
