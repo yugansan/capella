@@ -94,7 +94,7 @@ public class SpecificPackageSupplierFactory {
       } else if (rootFunction instanceof LogicalFunction) {
         result = getSpecificPackageSupplier(rootFunction, LaPackage.Literals.LOGICAL_FUNCTION__OWNED_LOGICAL_FUNCTION_PKGS);
       } else if (rootFunction instanceof SystemFunction) {
-        result = getSpecificPackageSupplier(rootFunction, CtxPackage.Literals.SYSTEM_FUNCTION_PKG__OWNED_SYSTEM_FUNCTION_PKGS);
+        result = getSpecificPackageSupplier(rootFunction, CtxPackage.Literals.SYSTEM_FUNCTION__OWNED_SYSTEM_FUNCTION_PKGS);
       } else if (rootFunction instanceof OperationalActivity) {
         result = getSpecificPackageSupplier(rootFunction, OaPackage.Literals.OPERATIONAL_ACTIVITY__OWNED_OPERATIONAL_ACTIVITY_PKGS);
       }
