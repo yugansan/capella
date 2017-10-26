@@ -25,7 +25,6 @@ import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.polarsys.capella.common.flexibility.properties.schema.IProperty;
 import org.polarsys.capella.common.flexibility.properties.schema.IPropertyContext;
-import org.polarsys.capella.common.re.Activator;
 import org.polarsys.capella.common.re.CatalogElement;
 import org.polarsys.capella.common.re.CatalogElementLink;
 import org.polarsys.capella.common.re.constants.IReConstants;
@@ -367,10 +366,11 @@ public class DefaultLocationHandler implements ILocationHandler {
   protected Iterator<EObject> retrieveDefaultContainers(CatalogElementLink link, CatalogElementLink oppositeLink, IContext context) {
 
     Collection<Object> elementsContainers = new LinkedHashSet<Object>(); // order is important!
+
     retrieveDefaultContainersForComposite(link, elementsContainers, context);
 
     String parentLocator = getParentLocator(context);
-    if (IReConstants.LOCATOR_OPTION_DEFAULT.equals(parentLocator) || IReConstants.LOCATOR_OPTION_MANUAL.equals(parentLocator)) {
+    if (parentLocator == null || IReConstants.LOCATOR_OPTION_DEFAULT.equals(parentLocator) || IReConstants.LOCATOR_OPTION_MANUAL.equals(parentLocator)) {
 
       retrieveDefaultContainersFromSelection(link, oppositeLink, elementsContainers, context);
       retrieveDefaultContainersFromSiblingLinks(link, elementsContainers, false, context);
@@ -435,14 +435,11 @@ public class DefaultLocationHandler implements ILocationHandler {
   }
 
   private String getParentLocator(IContext context) {
+    String result = null;
     String scope = (String) context.get(ITransitionConstants.OPTIONS_SCOPE);
     IPropertyContext propertyContext = ((IPropertyHandler) OptionsHandlerHelper.getInstance(context)).getPropertyContext(context, scope);
     IProperty parentLocatorProperty = propertyContext.getProperties().getProperty(IReConstants.PROPERTY__PARENT_LOCATOR);
-
-    String result = IReConstants.LOCATOR_OPTION_DEFAULT;
-    if (parentLocatorProperty == null) {
-      Activator.getDefault().getLog().log(new Status(IStatus.WARNING, Activator.PLUGIN_ID, String.format("Expected property '%s' is not available in this context'", IReConstants.PROPERTY__PARENT_LOCATOR))); //$NON-NLS-1$
-    } else {
+    if (parentLocatorProperty != null) { // null during "Update REC from selected RPL"
       result = (String) propertyContext.getCurrentValue(parentLocatorProperty);
     }
     return result;
