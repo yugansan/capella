@@ -49,7 +49,7 @@ public class CapellaLocationHandler extends DefaultLocationHandler {
 
       String scope = (String) context.get(ITransitionConstants.OPTIONS_SCOPE);
       IPropertyContext propertyContext = ((IPropertyHandler) OptionsHandlerHelper.getInstance(context)).getPropertyContext(context, scope);
-      adapter = new SpecificPackageLocationAdapter(propertyContext);
+      adapter = new SpecificPackageLocationAdapter(propertyContext, getDestinationResource(context));
 
       rpl.eAdapters().add(adapter);
       adapters.add(adapter);

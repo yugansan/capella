@@ -67,11 +67,9 @@ public class DefaultLocationHandler implements ILocationHandler {
     if (location == null) {
       return true;
     }
-    Collection<EObject> elements = (Collection<EObject>) context.get(ITransitionConstants.TRANSITION_SOURCES);
+
     CatalogElement sourceElement = ReplicableElementHandlerHelper.getInstance(context).getSource(context);
     CatalogElement targetElement = ReplicableElementHandlerHelper.getInstance(context).getTarget(context);
-
-    Resource destinationResource = elements.iterator().next().eResource();
 
     // Retrieve if the given Link is from the Source or the Target
     boolean isSource = false;
@@ -96,6 +94,8 @@ public class DefaultLocationHandler implements ILocationHandler {
       isSelectionForSource = true;
     } // when creating a RPL, user can select the REC instead of a real location..., isSelectionForSource should be true in that case
 
+    Resource destinationResource = getDestinationResource(context);
+
     // Change the resource according to selection
     Resource sourceElementResource;
     Resource targetElementResource;
@@ -115,6 +115,18 @@ public class DefaultLocationHandler implements ILocationHandler {
     }
 
     return false;
+  }
+
+  /**
+   * Find the destination resource of the current operation, i.e. the resoure that contains the
+   * elements that were selected when the operation was invoked.
+   *
+   * @param context the transition context
+   * @return the destination resource
+   */
+  protected final Resource getDestinationResource(IContext context) {
+    Collection<EObject> elements = (Collection<EObject>) context.get(ITransitionConstants.TRANSITION_SOURCES);
+    return elements.iterator().next().eResource();
   }
 
   /**
@@ -445,6 +457,15 @@ public class DefaultLocationHandler implements ILocationHandler {
     return result;
   }
 
+  /**
+   * Finds a supplier that can provide a specific package for the given link's target element. This default
+   * implementation returns null, subclasses are expected to override.
+   *
+   * @param link the link for whose target element a package supplier is needed
+   * @param oppositeLink the opposing link
+   * @param context the transition context
+   * @return
+   */
   protected Supplier<EObject> getSpecificPackage(CatalogElementLink link, CatalogElementLink oppositeLink, IContext context) {
     return null;
   }

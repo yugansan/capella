@@ -18,6 +18,7 @@ import java.util.function.Supplier;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.impl.AdapterImpl;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.resource.Resource;
 import org.polarsys.capella.common.flexibility.properties.PropertyChangeListener;
 import org.polarsys.capella.common.flexibility.properties.PropertyChangedEvent;
 import org.polarsys.capella.common.flexibility.properties.schema.IPropertyContext;
@@ -28,7 +29,18 @@ import org.polarsys.capella.core.data.capellacore.NamedElement;
 
 class SpecificPackageLocationAdapter extends AdapterImpl {
 
-  SpecificPackageLocationAdapter(IPropertyContext context) {
+  /**
+   * The factory that actually creates the packages for this adapter.
+   */
+  private final SpecificPackageSupplierFactory factory;
+
+  /**
+   * Stores all created packages so we can delete empty ones on disposal
+   * and to keep the package names in sync with the rpl name.
+   */
+  private final Collection<EObject> created = new HashSet<EObject>();
+
+  SpecificPackageLocationAdapter(IPropertyContext context, Resource destinationResource) {
 
     // The name isn't set on the RPL CatalogElement EObject until the wizard
     // finishes so we must listen to property changes too
@@ -45,18 +57,11 @@ class SpecificPackageLocationAdapter extends AdapterImpl {
       }
     });
 
+    factory = new SpecificPackageSupplierFactory(destinationResource);
+
   }
 
-  /**
-   * Stores all created packages so we can delete empty ones on disposal
-   * and to keep the package names in sync with the rpl name.
-   */
-  Collection<EObject> created = new HashSet<EObject>();
 
-  /**
-   * The factory that actually creates the packages for this adapter.
-   */
-  SpecificPackageSupplierFactory factory = new SpecificPackageSupplierFactory();
 
   @Override
   public void notifyChanged(Notification msg) {
