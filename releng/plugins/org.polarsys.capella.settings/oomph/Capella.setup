@@ -985,7 +985,7 @@
         <repositoryList
             name="Neon">
           <repository
-              url="http://download.eclipse.org/sirius/updates/milestones/5.1.0rc2/neon"/>
+              url="http://download.eclipse.org/sirius/updates/milestones/5.1.0rc3/neon"/>
         </repositoryList>
       </targlet>
       <targlet
@@ -1031,9 +1031,9 @@
         <repositoryList
             name="Neon">
           <repository
-              url="https://hudson.polarsys.org/kitalpha/job/Kitalpha_master/499/artifact/result/publish/kitalpha_runtime/site.p2"/>
+              url="https://hudson.polarsys.org/kitalpha/job/Kitalpha_master/525/artifact/result/publish/kitalpha_runtime/site.p2"/>
           <repository
-              url="https://hudson.polarsys.org/kitalpha/job/Kitalpha_master/499/artifact/result/publish/kitalpha_sdk/site.p2"/>
+              url="https://hudson.polarsys.org/kitalpha/job/Kitalpha_master/525/artifact/result/publish/kitalpha_sdk/site.p2"/>
         </repositoryList>
       </targlet>
       <targlet
@@ -1069,7 +1069,7 @@
         <repositoryList
             name="Neon">
           <repository
-              url="http://download.eclipse.org/modeling/amalgam/updates/nightly/1.9.0-N20171004-042126/capella"/>
+              url="http://download.eclipse.org/modeling/amalgam/updates/nightly/1.9.0-N17/capella"/>
         </repositoryList>
       </targlet>
       <targlet
