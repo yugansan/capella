@@ -820,6 +820,14 @@
                   name="Locate parents manually"
                   value="manualLocator">
             </option>
+            <parameter
+                  id="default"
+                  value="defaultLocator">
+            </parameter>
+            <parameter
+                  id="scope"
+                  value="org.polarsys.capella.common.re">
+            </parameter>
          </property>
          
          
