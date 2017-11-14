@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *   
+ *
  * Contributors:
  *    Thales - initial API and implementation
  *******************************************************************************/
@@ -15,6 +15,8 @@ import java.util.Collection;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.transaction.RecordingCommand;
+import org.eclipse.emf.transaction.TransactionalEditingDomain;
+import org.eclipse.emf.transaction.util.TransactionUtil;
 import org.polarsys.capella.core.data.la.CapabilityRealizationPkg;
 import org.polarsys.capella.core.data.la.LaFactory;
 import org.polarsys.capella.core.data.la.LogicalActorPkg;
@@ -29,8 +31,8 @@ public class CreateRPL_SpecificPackages_LA extends CreateRPL_SpecificPackages {
   protected Collection<EObject> getRecElements(CapellaModelSkeleton project){
 
     final Collection<EObject> result = new ArrayList<EObject>();
-
-    manager.getEditingDomain().getCommandStack().execute(new RecordingCommand(manager.getEditingDomain()) {
+    TransactionalEditingDomain domain = TransactionUtil.getEditingDomain(project.getSystemEngineering());
+    domain.getCommandStack().execute(new RecordingCommand(domain) {
 
       @Override
       protected void doExecute() {

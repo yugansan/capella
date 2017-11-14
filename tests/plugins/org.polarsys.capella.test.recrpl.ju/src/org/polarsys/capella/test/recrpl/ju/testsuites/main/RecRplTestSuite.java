@@ -29,7 +29,9 @@ import org.polarsys.capella.test.recrpl.ju.testcases.CreateRPL_SharedElements_Ex
 import org.polarsys.capella.test.recrpl.ju.testcases.CreateRPL_SharedElements_ExternalResource;
 import org.polarsys.capella.test.recrpl.ju.testcases.CreateRPL_SharedElements_Interface;
 import org.polarsys.capella.test.recrpl.ju.testcases.CreateRPL_SimpleCase;
+import org.polarsys.capella.test.recrpl.ju.testcases.CreateRPL_SpecificPackages_Combined;
 import org.polarsys.capella.test.recrpl.ju.testcases.CreateRPL_SpecificPackages_Data;
+import org.polarsys.capella.test.recrpl.ju.testcases.CreateRPL_SpecificPackages_Interfaces;
 import org.polarsys.capella.test.recrpl.ju.testcases.CreateRPL_SpecificPackages_LA;
 import org.polarsys.capella.test.recrpl.ju.testcases.CreateRPL_SpecificPackages_OA;
 import org.polarsys.capella.test.recrpl.ju.testcases.CreateRPL_SpecificPackages_PA;
@@ -98,6 +100,8 @@ public class RecRplTestSuite extends BasicTestSuite {
     tests.add(new CreateRPL_SpecificPackages_SA());
     tests.add(new CreateRPL_SpecificPackages_LA());
     tests.add(new CreateRPL_SpecificPackages_PA());
+    tests.add(new CreateRPL_SpecificPackages_Interfaces());
+    tests.add(new CreateRPL_SpecificPackages_Combined());
     return tests;
   }
 

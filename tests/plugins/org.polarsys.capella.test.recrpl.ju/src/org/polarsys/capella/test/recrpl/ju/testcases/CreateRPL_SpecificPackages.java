@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *   
+ *
  * Contributors:
  *    Thales - initial API and implementation
  *******************************************************************************/
@@ -38,6 +38,7 @@ import org.polarsys.capella.core.data.cs.CsPackage;
 import org.polarsys.capella.core.data.ctx.CtxPackage;
 import org.polarsys.capella.core.data.ctx.SystemAnalysis;
 import org.polarsys.capella.core.data.ctx.SystemFunctionPkg;
+import org.polarsys.capella.core.data.information.ExchangeItem;
 import org.polarsys.capella.core.data.information.InformationPackage;
 import org.polarsys.capella.core.data.la.LaPackage;
 import org.polarsys.capella.core.data.la.LogicalArchitecture;
@@ -110,7 +111,8 @@ public abstract class CreateRPL_SpecificPackages extends RecRplTestCase {
       .build();
 
     CapellaModelSkeleton project;
-    ExecutionManager manager;
+
+    private ExecutionManager manager;
     Resource resource;
 
   @Override
@@ -191,16 +193,21 @@ public abstract class CreateRPL_SpecificPackages extends RecRplTestCase {
 
           assertTrue(targetContainer.eClass() == expectedContainerClass);
 
+          // The target and origin element should always be in the same block
+          BlockArchitecture originBlock = BlockArchitectureExt.getRootBlockArchitecture(link.getOrigin().getTarget());
+          BlockArchitecture targetBlock = BlockArchitectureExt.getRootBlockArchitecture(target);
+
+          assertSame(originBlock, targetBlock);
+
           // There should be at most one specific package of a given type per block architecture
-          BlockArchitecture block = BlockArchitectureExt.getRootBlockArchitecture(target);
-          Map.Entry<EClass, EClass> key = new SimpleImmutableEntry<EClass, EClass>(block.eClass(), targetContainer.eClass());
+          Map.Entry<EClass, EClass> key = new SimpleImmutableEntry<EClass, EClass>(targetBlock.eClass(), targetContainer.eClass());
 
           EObject previous = packages.put(key, targetContainer);
           if (previous != null) {
             assertSame(targetContainer, previous);
           }
 
-          assertSame(getExpectedPackageContainer(block, targetContainer.eClass()), targetContainer.eContainer());
+          assertSame(getExpectedPackageContainer(targetBlock, targetContainer.eClass()), targetContainer.eContainer());
 
         }
 
@@ -213,6 +220,11 @@ public abstract class CreateRPL_SpecificPackages extends RecRplTestCase {
   }
 
   protected EClass getExpectedContainerClass(EObject target) {
+
+    // Here it depends if the EI is in a data pkg or an interface pkg..
+    if (target instanceof ExchangeItem) {
+      return getExpectedContainerClass(target.eContainer());
+    }
 
     EClass result = test.get(target.eClass());
 
@@ -305,5 +317,9 @@ public abstract class CreateRPL_SpecificPackages extends RecRplTestCase {
 
     return null;
   }
+
+
+
+
 
 }
