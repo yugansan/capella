@@ -11,6 +11,7 @@
 package org.polarsys.capella.core.re.handlers.location;
 
 import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,15 +23,25 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.util.ComposedSwitch;
 import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.eclipse.emf.ecore.util.Switch;
+import org.polarsys.capella.common.helpers.EcoreUtil2;
 import org.polarsys.capella.core.data.capellacommon.StateEvent;
+import org.polarsys.capella.core.data.capellacommon.util.CapellacommonSwitch;
+import org.polarsys.capella.core.data.capellacore.AbstractPropertyValue;
+import org.polarsys.capella.core.data.capellacore.CapellacorePackage;
+import org.polarsys.capella.core.data.capellacore.EnumerationPropertyType;
+import org.polarsys.capella.core.data.capellacore.PropertyValueGroup;
+import org.polarsys.capella.core.data.capellacore.PropertyValuePkg;
 import org.polarsys.capella.core.data.capellacore.Structure;
-import org.polarsys.capella.core.data.cs.AbstractActor;
+import org.polarsys.capella.core.data.capellacore.util.CapellacoreSwitch;
 import org.polarsys.capella.core.data.cs.BlockArchitecture;
-import org.polarsys.capella.core.data.cs.Component;
 import org.polarsys.capella.core.data.cs.CsPackage;
 import org.polarsys.capella.core.data.cs.Interface;
 import org.polarsys.capella.core.data.cs.InterfacePkg;
+import org.polarsys.capella.core.data.cs.util.CsSwitch;
+import org.polarsys.capella.core.data.ctx.Actor;
 import org.polarsys.capella.core.data.ctx.ActorPkg;
 import org.polarsys.capella.core.data.ctx.Capability;
 import org.polarsys.capella.core.data.ctx.CapabilityPkg;
@@ -39,34 +50,58 @@ import org.polarsys.capella.core.data.ctx.Mission;
 import org.polarsys.capella.core.data.ctx.MissionPkg;
 import org.polarsys.capella.core.data.ctx.SystemAnalysis;
 import org.polarsys.capella.core.data.ctx.SystemFunction;
+import org.polarsys.capella.core.data.ctx.SystemFunctionPkg;
+import org.polarsys.capella.core.data.ctx.util.CtxSwitch;
 import org.polarsys.capella.core.data.fa.AbstractFunction;
+import org.polarsys.capella.core.data.fa.ExchangeCategory;
+import org.polarsys.capella.core.data.fa.util.FaSwitch;
+import org.polarsys.capella.core.data.information.Class;
 import org.polarsys.capella.core.data.information.DataPkg;
+import org.polarsys.capella.core.data.information.ExchangeItem;
 import org.polarsys.capella.core.data.information.InformationPackage;
 import org.polarsys.capella.core.data.information.KeyPart;
+import org.polarsys.capella.core.data.information.Union;
 import org.polarsys.capella.core.data.information.Unit;
-import org.polarsys.capella.core.data.information.communication.Message;
-import org.polarsys.capella.core.data.information.communication.Signal;
+import org.polarsys.capella.core.data.information.communication.CommunicationItem;
+import org.polarsys.capella.core.data.information.communication.util.CommunicationSwitch;
 import org.polarsys.capella.core.data.information.datatype.DataType;
+import org.polarsys.capella.core.data.information.datatype.util.DatatypeSwitch;
+import org.polarsys.capella.core.data.information.datavalue.DataValue;
+import org.polarsys.capella.core.data.information.datavalue.util.DatavalueSwitch;
+import org.polarsys.capella.core.data.information.util.InformationSwitch;
 import org.polarsys.capella.core.data.la.CapabilityRealization;
 import org.polarsys.capella.core.data.la.CapabilityRealizationPkg;
 import org.polarsys.capella.core.data.la.LaPackage;
+import org.polarsys.capella.core.data.la.LogicalActor;
 import org.polarsys.capella.core.data.la.LogicalActorPkg;
+import org.polarsys.capella.core.data.la.LogicalArchitecture;
 import org.polarsys.capella.core.data.la.LogicalComponent;
+import org.polarsys.capella.core.data.la.LogicalComponentPkg;
 import org.polarsys.capella.core.data.la.LogicalFunction;
+import org.polarsys.capella.core.data.la.LogicalFunctionPkg;
+import org.polarsys.capella.core.data.la.util.LaSwitch;
 import org.polarsys.capella.core.data.oa.Entity;
 import org.polarsys.capella.core.data.oa.EntityPkg;
 import org.polarsys.capella.core.data.oa.OaFactory;
 import org.polarsys.capella.core.data.oa.OaPackage;
 import org.polarsys.capella.core.data.oa.OperationalActivity;
+import org.polarsys.capella.core.data.oa.OperationalActivityPkg;
+import org.polarsys.capella.core.data.oa.OperationalActor;
 import org.polarsys.capella.core.data.oa.OperationalAnalysis;
 import org.polarsys.capella.core.data.oa.OperationalCapability;
 import org.polarsys.capella.core.data.oa.OperationalCapabilityPkg;
 import org.polarsys.capella.core.data.oa.Role;
 import org.polarsys.capella.core.data.oa.RolePkg;
+import org.polarsys.capella.core.data.oa.util.OaSwitch;
 import org.polarsys.capella.core.data.pa.PaPackage;
+import org.polarsys.capella.core.data.pa.PhysicalActor;
 import org.polarsys.capella.core.data.pa.PhysicalActorPkg;
+import org.polarsys.capella.core.data.pa.PhysicalArchitecture;
 import org.polarsys.capella.core.data.pa.PhysicalComponent;
+import org.polarsys.capella.core.data.pa.PhysicalComponentPkg;
 import org.polarsys.capella.core.data.pa.PhysicalFunction;
+import org.polarsys.capella.core.data.pa.PhysicalFunctionPkg;
+import org.polarsys.capella.core.data.pa.util.PaSwitch;
 import org.polarsys.capella.core.model.helpers.BlockArchitectureExt;
 import org.polarsys.capella.core.model.helpers.SystemAnalysisExt;
 import org.polarsys.capella.core.model.helpers.naming.NamingConstants;
@@ -76,19 +111,47 @@ import org.polarsys.capella.core.model.helpers.naming.NamingConstants;
  * It is guaranteed that only one package is created for multiple invocations
  * with elements that should go to the same package, but this is limited to invocations on a single instance.
  */
-class SpecificPackageSupplierFactory {
+public class SpecificPackageSupplierFactory {
 
+  private final ComposedSwitch<Supplier<EObject>> zwitch;
 
   /* this stores already created packages so for each setting only one package per instance is created */
   private final Map<Map.Entry<EObject,EStructuralFeature>, Supplier<EObject>> createdSuppliers = new HashMap<Map.Entry<EObject,EStructuralFeature>,Supplier<EObject>>();
 
   private final Resource destinationResource;
 
+  private BlockArchitecture destinationBlock;
+
+
+  /**
+   * Create a new instance where the destination resource is the same resource as the elements for which packages
+   * are searched.
+   */
+  public SpecificPackageSupplierFactory() {
+    this(null);
+  }
+
   /**
    * @param destinationResource the resource in which we create packages; the resource in which the RPL will 'live'
    */
-  SpecificPackageSupplierFactory(Resource destinationResource){
+  public SpecificPackageSupplierFactory(Resource destinationResource){
     this.destinationResource = destinationResource;
+
+    Collection<Switch<Supplier<EObject>>> theSwitches = Arrays.asList(
+        new Capellacommon(),
+        new Capellacore(),
+        new Datatype(),
+        new Datavalue(),
+        new Datavalue(),
+        new Communication(),
+        new Information(),
+        new Oa(),
+        new Ctx(),
+        new La(),
+        new Pa()
+    );
+
+    zwitch = new ComposedSwitch<Supplier<EObject>>(theSwitches);
   }
 
   /**
@@ -99,129 +162,10 @@ class SpecificPackageSupplierFactory {
    * @return a supplier or null for elements that are not added to specific packages
    */
   public Supplier<EObject> getSpecificPackageSupplier(EObject packagedElement) {
-
-    Supplier<EObject> result = null;
-
-    BlockArchitecture block = findDestinationBlock(packagedElement);
-
-    if (block != null) {
-
-      if (packagedElement instanceof AbstractFunction) {
-
-        AbstractFunction rootFunction = BlockArchitectureExt.getRootFunction(block, true);
-
-        if (rootFunction instanceof PhysicalFunction) {
-          result = getSpecificPackageSupplier(rootFunction, PaPackage.Literals.PHYSICAL_FUNCTION__OWNED_PHYSICAL_FUNCTION_PKGS);
-        } else if (rootFunction instanceof LogicalFunction) {
-          result = getSpecificPackageSupplier(rootFunction, LaPackage.Literals.LOGICAL_FUNCTION__OWNED_LOGICAL_FUNCTION_PKGS);
-        } else if (rootFunction instanceof SystemFunction) {
-          result = getSpecificPackageSupplier(rootFunction, CtxPackage.Literals.SYSTEM_FUNCTION__OWNED_SYSTEM_FUNCTION_PKGS);
-        } else if (rootFunction instanceof OperationalActivity) {
-          result = getSpecificPackageSupplier(rootFunction, OaPackage.Literals.OPERATIONAL_ACTIVITY__OWNED_OPERATIONAL_ACTIVITY_PKGS);
-        }
-
-      } else if (packagedElement instanceof AbstractActor) {
-
-        Structure actorPkg = BlockArchitectureExt.getActorPkg(block, true);
-        if (actorPkg instanceof ActorPkg) {
-          result = getSpecificPackageSupplier(actorPkg, CtxPackage.Literals.ACTOR_PKG__OWNED_ACTOR_PKGS);
-        } else if (actorPkg instanceof LogicalActorPkg) {
-          result = getSpecificPackageSupplier(actorPkg, LaPackage.Literals.LOGICAL_ACTOR_PKG__OWNED_LOGICAL_ACTOR_PKGS);
-        } else if (actorPkg instanceof PhysicalActorPkg) {
-          result = getSpecificPackageSupplier(actorPkg, PaPackage.Literals.PHYSICAL_ACTOR_PKG__OWNED_PHYSICAL_ACTOR_PKGS);
-        }
-
-      } else if (packagedElement instanceof Component) {
-
-        Component rootComponent = (Component) getFirstMatch(block.eContents(), packagedElement.eClass());
-
-        if (rootComponent instanceof PhysicalComponent) {
-          result = getSpecificPackageSupplier(rootComponent, PaPackage.Literals.PHYSICAL_COMPONENT__OWNED_PHYSICAL_COMPONENT_PKGS);
-        } else if (rootComponent instanceof LogicalComponent) {
-          result = getSpecificPackageSupplier(rootComponent, LaPackage.Literals.LOGICAL_COMPONENT__OWNED_LOGICAL_COMPONENT_PKGS);
-        }
-
-      } else if (packagedElement instanceof Interface) {
-        InterfacePkg interfacePkg = BlockArchitectureExt.getInterfacePkg(block, true);
-        result = getSpecificPackageSupplier(interfacePkg, CsPackage.Literals.INTERFACE_PKG__OWNED_INTERFACE_PKGS);
-
-      } else if (
-          packagedElement instanceof org.polarsys.capella.core.data.information.Class
-          || packagedElement instanceof DataType
-          || packagedElement instanceof org.polarsys.capella.core.data.information.Collection
-          || packagedElement instanceof Unit
-          || packagedElement instanceof KeyPart
-          || packagedElement instanceof StateEvent
-          || packagedElement instanceof Signal
-          || packagedElement instanceof Exception
-          || packagedElement instanceof Message
-          ) {
-
-        DataPkg dataPkg = BlockArchitectureExt.getDataPkg(block, true);
-        result = getSpecificPackageSupplier(dataPkg, InformationPackage.Literals.DATA_PKG__OWNED_DATA_PKGS);
-
-      } else if (packagedElement instanceof Mission) {
-        if (block instanceof SystemAnalysis) {
-          MissionPkg missionPkg = SystemAnalysisExt.getMissionPkg((SystemAnalysis) block);
-          result = getSpecificPackageSupplier(missionPkg, CtxPackage.Literals.MISSION_PKG__OWNED_MISSION_PKGS);
-        }
-      } else if (packagedElement instanceof OperationalCapability) {
-
-        OperationalCapabilityPkg pkg = (OperationalCapabilityPkg) BlockArchitectureExt.getAbstractCapabilityPkg(block, true);
-        result = getSpecificPackageSupplier(pkg, OaPackage.Literals.OPERATIONAL_CAPABILITY_PKG__OWNED_OPERATIONAL_CAPABILITY_PKGS);
-
-      } else if (packagedElement instanceof Capability) {
-        CapabilityPkg pkg = (CapabilityPkg) BlockArchitectureExt.getAbstractCapabilityPkg(block, true);
-        result = getSpecificPackageSupplier(pkg, CtxPackage.Literals.CAPABILITY_PKG__OWNED_CAPABILITY_PKGS);
-
-      } else if (packagedElement instanceof CapabilityRealization) {
-        CapabilityRealizationPkg pkg = (CapabilityRealizationPkg) BlockArchitectureExt.getAbstractCapabilityPkg(block, true);
-        result = getSpecificPackageSupplier(pkg, LaPackage.Literals.CAPABILITY_REALIZATION_PKG__OWNED_CAPABILITY_REALIZATION_PKGS);
-
-      } else if (packagedElement instanceof Entity) {
-
-        if (block instanceof OperationalAnalysis) {
-
-          EntityPkg pkg = ((OperationalAnalysis) block).getOwnedEntityPkg();
-          if (pkg == null) {
-            // FIXME move this to OperationalAnalysisExt
-            pkg = OaFactory.eINSTANCE.createEntityPkg(NamingConstants.CreateOpAnalysisCmd_operationalEntities_pkg_name);
-            ((OperationalAnalysis) block).setOwnedEntityPkg(pkg);
-          }
-
-          result = getSpecificPackageSupplier(pkg, OaPackage.Literals.ENTITY_PKG__OWNED_ENTITY_PKGS);
-
-        }
-
-      } else if (packagedElement instanceof Role) {
-
-        if (block instanceof OperationalAnalysis) {
-
-          RolePkg pkg = ((OperationalAnalysis) block).getOwnedRolePkg();
-          if (pkg == null) {
-            // FIXME move this to OperationalAnalysisExt
-            pkg = OaFactory.eINSTANCE.createRolePkg(NamingConstants.CreateOpAnalysisCmd_roles_pkg_name);
-            ((OperationalAnalysis) block).setOwnedRolePkg(pkg);
-          }
-
-          result = getSpecificPackageSupplier(pkg, OaPackage.Literals.ROLE_PKG__OWNED_ROLE_PKGS);
-
-        }
-      }
-    }
-    return result;
-
+    destinationBlock = findDestinationBlock(packagedElement);
+    return zwitch.doSwitch(packagedElement);
   }
 
-
-  private EObject getFirstMatch(Collection<EObject> elements, EClass clazz) {
-    for (EObject e : elements) {
-      if (e.eClass() == clazz) {
-        return e;
-      }
-    }
-    return null;
-  }
 
   /**
    * Find the first BlockArchitecture in the destination resource that
@@ -233,8 +177,11 @@ class SpecificPackageSupplierFactory {
     BlockArchitecture packagedElementBlock = BlockArchitectureExt.getRootBlockArchitecture(packagedElement);
 
     if (packagedElementBlock != null) {
+
       EClass clazz = packagedElementBlock.eClass();
-      for (TreeIterator<EObject> it = destinationResource.getAllContents(); it.hasNext();) {
+      Resource resource = destinationResource == null ? packagedElement.eResource() : destinationResource;
+
+      for (TreeIterator<EObject> it = resource.getAllContents(); it.hasNext();) {
         EObject next = it.next();
         if (next instanceof BlockArchitecture) {
           if (next.eClass() == clazz) {
@@ -272,6 +219,418 @@ class SpecificPackageSupplierFactory {
       createdSuppliers.put(key, created);
     }
     return created;
+  }
+
+
+  class La extends LaSwitch<Supplier<EObject>> {
+
+    @Override
+    public Supplier<EObject> caseLogicalFunction(LogicalFunction object) {
+      return getLogicalFunctionPkg();
+    }
+
+    @Override
+    public Supplier<EObject> caseLogicalFunctionPkg(LogicalFunctionPkg object) {
+      return getLogicalFunctionPkg();
+    }
+
+    @Override
+    public Supplier<EObject> caseLogicalComponentPkg(LogicalComponentPkg object) {
+      return getLogicalComponentPkg();
+    }
+
+    @Override
+    public Supplier<EObject> caseLogicalComponent(LogicalComponent object) {
+      return getLogicalComponentPkg();
+    }
+
+    @Override
+    public Supplier<EObject> caseCapabilityRealization(CapabilityRealization object) {
+      return getCapabilityRealizationPkg();
+    }
+
+    @Override
+    public Supplier<EObject> caseCapabilityRealizationPkg(CapabilityRealizationPkg object) {
+      return getCapabilityRealizationPkg();
+    }
+
+    @Override
+    public Supplier<EObject> caseLogicalActorPkg(LogicalActorPkg object) {
+      return getLogicalActorPkg();
+    }
+
+    @Override
+    public Supplier<EObject> caseLogicalActor(LogicalActor object) {
+      return getLogicalActorPkg();
+    }
+
+  }
+
+  class Pa extends PaSwitch<Supplier<EObject>> {
+
+    @Override
+    public Supplier<EObject> casePhysicalFunction(PhysicalFunction object) {
+      return getPhysicalFunctionPkg();
+    }
+
+    @Override
+    public Supplier<EObject> casePhysicalFunctionPkg(PhysicalFunctionPkg object) {
+      return getPhysicalFunctionPkg();
+    }
+
+    @Override
+    public Supplier<EObject> casePhysicalComponent(PhysicalComponent object) {
+      return getPhysicalComponentPkg();
+    }
+
+    @Override
+    public Supplier<EObject> casePhysicalComponentPkg(PhysicalComponentPkg object) {
+      return getPhysicalComponentPkg();
+    }
+
+
+    @Override
+    public Supplier<EObject> casePhysicalActorPkg(PhysicalActorPkg object) {
+      return getPhysicalActorPkg();
+    }
+
+    @Override
+    public Supplier<EObject> casePhysicalActor(PhysicalActor object) {
+      return getPhysicalActorPkg();
+    }
+
+  }
+
+  class Fa extends FaSwitch<Supplier<EObject>> {
+
+    @Override
+    public Supplier<EObject> caseExchangeCategory(ExchangeCategory object) {
+      // here it depends on the parent
+      EObject container = object.eContainer();
+      if (container != null) {
+        return zwitch.doSwitch(container);
+      }
+      return null;
+    }
+
+  }
+
+  class Oa extends OaSwitch<Supplier<EObject>> {
+
+    @Override
+    public Supplier<EObject> caseOperationalActivityPkg(OperationalActivityPkg object) {
+      return getOperationalActivityPkg();
+    }
+
+    @Override
+    public Supplier<EObject> caseOperationalActivity(OperationalActivity object) {
+      return getOperationalActivityPkg();
+    }
+
+    @Override
+    public Supplier<EObject> caseOperationalCapabilityPkg(OperationalCapabilityPkg object) {
+      return getOperationalCapabilityPkg();
+    }
+
+    @Override
+    public Supplier<EObject> caseOperationalCapability(OperationalCapability object) {
+      return getOperationalCapabilityPkg();
+    }
+
+    @Override
+    public Supplier<EObject> caseRolePkg(RolePkg object) {
+      return getRolePkg();
+    }
+
+    @Override
+    public Supplier<EObject> caseRole(Role object) {
+       return getRolePkg();
+    }
+
+    @Override
+    public Supplier<EObject> caseEntityPkg(EntityPkg object) {
+      return getEntityPkg();
+    }
+
+    @Override
+    public Supplier<EObject> caseEntity(Entity object) {
+      return getEntityPkg();
+    }
+
+    @Override
+    public Supplier<EObject> caseOperationalActor(OperationalActor object) {
+      return getEntityPkg();
+    }
+
+  }
+
+  class Ctx extends CtxSwitch<Supplier<EObject>> {
+
+    @Override
+    public Supplier<EObject> caseSystemFunction(SystemFunction object) {
+      return getSystemFunctionPkg();
+    }
+
+    @Override
+    public Supplier<EObject> caseSystemFunctionPkg(SystemFunctionPkg object) {
+      return getSystemFunctionPkg();
+    }
+
+    @Override
+    public Supplier<EObject> caseActor(Actor object) {
+      return getActorPkg();
+    }
+
+    @Override
+    public Supplier<EObject> caseActorPkg(ActorPkg object) {
+      return getActorPkg();
+    }
+
+    @Override
+    public Supplier<EObject> caseMission(Mission object) {
+      return getMissionPkg();
+    }
+
+    @Override
+    public Supplier<EObject> caseMissionPkg(MissionPkg object) {
+      return getMissionPkg();
+    }
+
+    @Override
+    public Supplier<EObject> caseCapability(Capability object) {
+      return getCapabilityPkg();
+    }
+
+    @Override
+    public Supplier<EObject> caseCapabilityPkg(CapabilityPkg object) {
+      return getCapabilityPkg();
+    }
+
+  }
+
+  class Datatype extends DatatypeSwitch<Supplier<EObject>> {
+    @Override
+    public Supplier<EObject> caseDataType(DataType object) {
+      return getDataPkg();
+    }
+  }
+
+  class Datavalue extends DatavalueSwitch<Supplier<EObject>> {
+
+    @Override
+    public Supplier<EObject> caseDataValue(DataValue object) {
+      return getDataPkg();
+    }
+
+  }
+
+  class Communication extends CommunicationSwitch<Supplier<EObject>> {
+
+    @Override
+    public Supplier<EObject> caseCommunicationItem(CommunicationItem object) {
+      return getDataPkg();
+    }
+
+  }
+
+  class Cs extends CsSwitch<Supplier<EObject>> {
+
+    @Override
+    public Supplier<EObject> caseInterfacePkg(InterfacePkg object) {
+      return getInterfacePkg();
+    }
+
+    @Override
+    public Supplier<EObject> caseInterface(Interface object) {
+      return getInterfacePkg();
+    }
+
+  }
+
+  class Information extends InformationSwitch<Supplier<EObject>> {
+
+    @Override
+    public Supplier<EObject> caseDataPkg(DataPkg object) {
+      return getDataPkg();
+    }
+
+    @Override
+    public Supplier<EObject> caseExchangeItem(ExchangeItem object) {
+      // here it depends if the ei is in an interfacepkg or a datapkg
+      EObject aep = EcoreUtil2.getFirstContainer(object, CapellacorePackage.Literals.ABSTRACT_EXCHANGE_ITEM_PKG);
+      if (aep != null) {
+        return zwitch.doSwitch(aep);
+      }
+      return null;
+    }
+
+    @Override
+    public Supplier<EObject> caseDataValue(DataValue object) {
+      return getDataPkg();
+    }
+
+    @Override
+    public Supplier<EObject> caseClass(Class object) {
+      return getDataPkg();
+    }
+
+    @Override
+    public Supplier<EObject> caseCollection(org.polarsys.capella.core.data.information.Collection object) {
+      return getDataPkg();
+    }
+
+    @Override
+    public Supplier<EObject> caseKeyPart(KeyPart object) {
+      return getDataPkg();
+    }
+
+    @Override
+    public Supplier<EObject> caseUnion(Union object) {
+      return getDataPkg();
+    }
+
+    @Override
+    public Supplier<EObject> caseUnit(Unit object) {
+      return getDataPkg();
+    }
+
+  }
+
+  class Capellacommon extends CapellacommonSwitch<Supplier<EObject>> {
+
+    @Override
+    public Supplier<EObject> caseStateEvent(StateEvent object) {
+      return getDataPkg();
+    }
+
+  }
+
+  class Capellacore extends CapellacoreSwitch<Supplier<EObject>> {
+
+    @Override
+    public Supplier<EObject> caseAbstractPropertyValue(AbstractPropertyValue object) {
+      return getPropertyValuePkg();
+    }
+
+    @Override
+    public Supplier<EObject> casePropertyValueGroup(PropertyValueGroup object) {
+      return getPropertyValuePkg();
+    }
+
+    @Override
+    public Supplier<EObject> casePropertyValuePkg(PropertyValuePkg object) {
+      return getPropertyValuePkg();
+    }
+
+    @Override
+    public Supplier<EObject> caseEnumerationPropertyType(EnumerationPropertyType object) {
+      return getPropertyValuePkg();
+    }
+
+  }
+
+  private Supplier<EObject> getDataPkg() {
+    System.out.println(destinationBlock.eClass().getName());
+    DataPkg dataPkg = BlockArchitectureExt.getDataPkg(destinationBlock, true);
+    return getSpecificPackageSupplier(dataPkg, InformationPackage.Literals.DATA_PKG__OWNED_DATA_PKGS);
+  }
+
+  private Supplier<EObject> getInterfacePkg() {
+    InterfacePkg interfacePkg = BlockArchitectureExt.getInterfacePkg(destinationBlock, true);
+    return getSpecificPackageSupplier(interfacePkg, CsPackage.Literals.INTERFACE_PKG__OWNED_INTERFACE_PKGS);
+  }
+
+  private Supplier<EObject> getActorPkg(){
+    Structure actorPkg = BlockArchitectureExt.getActorPkg(destinationBlock, true);
+    return getSpecificPackageSupplier(actorPkg, CtxPackage.Literals.ACTOR_PKG__OWNED_ACTOR_PKGS);
+  }
+
+  private Supplier<EObject> getSystemFunctionPkg(){
+    AbstractFunction rootFunction = BlockArchitectureExt.getRootFunction(destinationBlock, true);
+    return getSpecificPackageSupplier(rootFunction, CtxPackage.Literals.SYSTEM_FUNCTION__OWNED_SYSTEM_FUNCTION_PKGS);
+  }
+
+  private Supplier<EObject> getMissionPkg(){
+    if (destinationBlock instanceof SystemAnalysis) {
+      MissionPkg missionPkg = SystemAnalysisExt.getMissionPkg((SystemAnalysis) destinationBlock);
+      return getSpecificPackageSupplier(missionPkg, CtxPackage.Literals.MISSION_PKG__OWNED_MISSION_PKGS);
+    }
+    return null;
+  }
+
+  private Supplier<EObject> getPhysicalActorPkg(){
+    Structure actorPkg = BlockArchitectureExt.getActorPkg(destinationBlock, true);
+    return getSpecificPackageSupplier(actorPkg, PaPackage.Literals.PHYSICAL_ACTOR_PKG__OWNED_PHYSICAL_ACTOR_PKGS);
+  }
+
+
+  private Supplier<EObject> getPhysicalComponentPkg(){
+    PhysicalComponent rootComponent = ((PhysicalArchitecture) destinationBlock).getOwnedPhysicalComponent();
+    return getSpecificPackageSupplier(rootComponent, PaPackage.Literals.PHYSICAL_COMPONENT__OWNED_PHYSICAL_COMPONENT_PKGS);
+  }
+
+  private Supplier<EObject> getPhysicalFunctionPkg(){
+    AbstractFunction rootFunction = BlockArchitectureExt.getRootFunction(destinationBlock, true);
+    return getSpecificPackageSupplier(rootFunction, PaPackage.Literals.PHYSICAL_FUNCTION__OWNED_PHYSICAL_FUNCTION_PKGS);
+  }
+
+  private Supplier<EObject> getLogicalComponentPkg(){
+    LogicalComponent rootComponent = ((LogicalArchitecture) destinationBlock).getOwnedLogicalComponent();
+    return getSpecificPackageSupplier(rootComponent, LaPackage.Literals.LOGICAL_COMPONENT__OWNED_LOGICAL_COMPONENT_PKGS);
+  }
+
+  private Supplier<EObject> getLogicalActorPkg(){
+    Structure actorPkg = BlockArchitectureExt.getActorPkg(destinationBlock, true);
+    return getSpecificPackageSupplier(actorPkg, LaPackage.Literals.LOGICAL_ACTOR_PKG__OWNED_LOGICAL_ACTOR_PKGS);
+  }
+
+  private Supplier<EObject> getOperationalCapabilityPkg(){
+    OperationalCapabilityPkg pkg = (OperationalCapabilityPkg) BlockArchitectureExt.getAbstractCapabilityPkg(destinationBlock, true);
+    return getSpecificPackageSupplier(pkg, OaPackage.Literals.OPERATIONAL_CAPABILITY_PKG__OWNED_OPERATIONAL_CAPABILITY_PKGS);
+  }
+
+  private Supplier<EObject> getCapabilityPkg(){
+    CapabilityPkg pkg = (CapabilityPkg) BlockArchitectureExt.getAbstractCapabilityPkg(destinationBlock, true);
+    return getSpecificPackageSupplier(pkg, CtxPackage.Literals.CAPABILITY_PKG__OWNED_CAPABILITY_PKGS);
+  }
+
+  private Supplier<EObject> getCapabilityRealizationPkg(){
+    CapabilityRealizationPkg pkg = (CapabilityRealizationPkg) BlockArchitectureExt.getAbstractCapabilityPkg(destinationBlock, true);
+    return getSpecificPackageSupplier(pkg, LaPackage.Literals.CAPABILITY_REALIZATION_PKG__OWNED_CAPABILITY_REALIZATION_PKGS);
+  }
+
+  private Supplier<EObject> getEntityPkg(){
+    EntityPkg pkg = ((OperationalAnalysis) destinationBlock).getOwnedEntityPkg();
+    if (pkg == null) {
+      // FIXME move this to OperationalAnalysisExt
+      pkg = OaFactory.eINSTANCE.createEntityPkg(NamingConstants.CreateOpAnalysisCmd_operationalEntities_pkg_name);
+      ((OperationalAnalysis) destinationBlock).setOwnedEntityPkg(pkg);
+    }
+    return getSpecificPackageSupplier(pkg, OaPackage.Literals.ENTITY_PKG__OWNED_ENTITY_PKGS);
+  }
+
+  private Supplier<EObject> getRolePkg(){
+    RolePkg pkg = ((OperationalAnalysis) destinationBlock).getOwnedRolePkg();
+    if (pkg == null) {
+      // FIXME move this to OperationalAnalysisExt
+      pkg = OaFactory.eINSTANCE.createRolePkg(NamingConstants.CreateOpAnalysisCmd_roles_pkg_name);
+      ((OperationalAnalysis) destinationBlock).setOwnedRolePkg(pkg);
+    }
+    return getSpecificPackageSupplier(pkg, OaPackage.Literals.ROLE_PKG__OWNED_ROLE_PKGS);
+  }
+
+  private Supplier<EObject> getLogicalFunctionPkg(){
+    AbstractFunction rootFunction = BlockArchitectureExt.getRootFunction(destinationBlock, true);
+    return getSpecificPackageSupplier(rootFunction, LaPackage.Literals.LOGICAL_FUNCTION__OWNED_LOGICAL_FUNCTION_PKGS);
+  }
+
+  private Supplier<EObject> getOperationalActivityPkg(){
+    AbstractFunction rootFunction = BlockArchitectureExt.getRootFunction(destinationBlock, true);
+    return getSpecificPackageSupplier(rootFunction, OaPackage.Literals.OPERATIONAL_ACTIVITY__OWNED_OPERATIONAL_ACTIVITY_PKGS);
+  }
+
+  private Supplier<EObject> getPropertyValuePkg(){
+    return getSpecificPackageSupplier(destinationBlock, CapellacorePackage.Literals.STRUCTURE__OWNED_PROPERTY_VALUE_PKGS);
   }
 
 }
