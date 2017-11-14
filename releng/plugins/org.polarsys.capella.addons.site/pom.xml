@@ -39,17 +39,17 @@
               <requirement>
                 <type>eclipse-feature</type>
                 <id>org.polarsys.capella.core.re.feature</id>
-                <versionRange>1.2.0.201710191456</versionRange>
+                <versionRange>1.2.0.201711030906</versionRange>
               </requirement>
 	      <requirement>
                 <type>eclipse-feature</type>
                 <id>org.polarsys.capella.common.feature</id>
-                <versionRange>1.2.0.201710191456</versionRange>
+                <versionRange>1.2.0.201711030906</versionRange>
               </requirement>
 	      <requirement>
                 <type>eclipse-feature</type>
                 <id>org.polarsys.capella.common.ui.feature</id>
-                <versionRange>1.2.0.201710191456</versionRange>
+                <versionRange>1.2.0.201711030906</versionRange>
               </requirement>
 	      <requirement>
                 <type>eclipse-plugin</type>

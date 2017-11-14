@@ -2,7 +2,7 @@
 <feature
       id="org.polarsys.capella.common.ui.feature"
       label="Dummy feature for build time constraints"
-      version="1.2.0.201710191456">
+      version="1.2.0.201711030906">
 
    <description url="http://www.example.com/description">
       [Enter Feature Description here.]

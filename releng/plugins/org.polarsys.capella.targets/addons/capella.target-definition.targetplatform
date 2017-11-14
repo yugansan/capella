@@ -14,6 +14,6 @@ include "../full/capella.target-definition.targetplatform"
 
 with source, requirements
 
-location capella-1.2.0-rc4 "https://hudson.polarsys.org/capella/view/Capella-master/job/capella-master/962/artifact/releng/plugins/org.polarsys.capella.rcp.site/target/repository" {
+location capella-1.2.0-rc5 "https://hudson.polarsys.org/capella/view/Capella-master/job/capella-master/1001/artifact/releng/plugins/org.polarsys.capella.rcp.site/target/repository" {
 	org.polarsys.capella.rcp.feature.feature.group
 }
