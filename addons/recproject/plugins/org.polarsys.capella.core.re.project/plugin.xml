@@ -15,20 +15,20 @@
    <extension
          point="org.eclipse.ui.commands">
          <command
-               description="Create REC from Library"
+               description="Create REC with whole library content"
                id="org.polarsys.capella.core.re.project.createREC"
-               name="Create REC from Library...">
+               name="Create REC with whole library content...">
       	</command>
       	<command
-             description="Update REC from Library"
+             description="Update REC with whole library content"
              id="org.polarsys.capella.core.re.project.updateREC"
-             name="Update REC from Library...">
+             name="Update REC with whole library content...">
       	</command>
           <command
           categoryId="org.polarsys.capella.common.re.subcommands"
-          description="Include all non-template elements from model"
+          description="Add whole library content"
           id="org.polarsys.capella.core.re.project.addAllNonTemplateElements"
-          name="Include all non-template elements from model">
+          name="Add whole library content">
     </command>
    </extension>
    <extension
