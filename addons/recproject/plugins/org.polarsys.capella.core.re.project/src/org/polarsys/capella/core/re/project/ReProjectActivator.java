@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.polarsys.capella.core.re.project;
 
-import org.eclipse.emf.common.util.URI;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
@@ -18,9 +17,6 @@ public class ReProjectActivator implements BundleActivator {
 
   public static final String PLUGIN_ID = "org.polarsys.capella.core.re.project"; //$NON-NLS-1$
 	private static BundleContext context;
-
-	public static final URI SKELETON_PROJECT_URI = URI.createPlatformPluginURI("/" + PLUGIN_ID + "/skeleton/skeletonProject.melodymodeller", false); //$NON-NLS-1$ //$NON-NLS-2$
-	public static final URI SKELETON_LIBRARY_URI = URI.createPlatformPluginURI("/" + PLUGIN_ID + "/skeleton/skeletonLibrary.melodymodeller", false); //$NON-NLS-1$ //$NON-NLS-2$
 
 	static BundleContext getContext() {
 		return context;

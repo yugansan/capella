@@ -17,6 +17,7 @@ Require-Bundle: org.eclipse.osgi,
  org.polarsys.capella.common.re;bundle-version="1.2.0",
  org.polarsys.capella.core.re,
  org.polarsys.capella.common.re.ui,
- org.polarsys.capella.common.flexibility.wizards
+ org.polarsys.capella.common.flexibility.wizards,
+ org.polarsys.capella.core.libraries.ui
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy

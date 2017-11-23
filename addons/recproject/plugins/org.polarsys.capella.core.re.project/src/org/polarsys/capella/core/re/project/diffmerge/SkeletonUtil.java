@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *   
+ *
  * Contributors:
  *    Thales - initial API and implementation
  *******************************************************************************/
@@ -23,6 +23,7 @@ import org.eclipse.emf.diffmerge.api.diff.IElementPresence;
 import org.eclipse.emf.diffmerge.api.scopes.IEditableModelScope;
 import org.eclipse.emf.diffmerge.diffdata.impl.EComparisonImpl;
 import org.eclipse.emf.diffmerge.impl.scopes.FragmentedModelScope;
+import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
@@ -30,39 +31,53 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.polarsys.capella.common.ef.ExecutionManager;
 import org.polarsys.capella.common.ef.ExecutionManagerRegistry;
 import org.polarsys.capella.core.data.capellamodeller.CapellamodellerPackage;
-import org.polarsys.capella.core.re.project.ReProjectActivator;
+import org.polarsys.capella.core.data.capellamodeller.Project;
+import org.polarsys.capella.core.libraries.ui.wizard.newLibrary.CreateCapellaLibraryCommand;
+import org.polarsys.capella.core.model.handler.helpers.CapellaProjectHelper.ProjectApproach;
+import org.polarsys.capella.core.model.skeleton.EngineeringDomain;
+import org.polarsys.capella.core.model.skeleton.impl.SkeletonServicesImpl;
+import org.polarsys.capella.core.model.skeleton.impl.cmd.CreateCapellaProjectCmd;
 
 public class SkeletonUtil {
 
-  /**
-   * Find all elements in model that are not part of the
-   * capella template.
-   */
-  public static Collection<EObject> getAllNonSkeletonElements(EObject context, Predicate<EObject> filter){
+  private static Project createSkeleton(EClass root, ExecutionManager manager) {
 
-    EObject first = context;
+    Project result = null;
+    ResourceSet set = manager.getEditingDomain().getResourceSet();
+    Resource skeletonResource = set.createResource(URI.createURI("skeleton.melodymodeller")); //$NON-NLS-1$
 
-    Resource res = first.eResource();
-    URI skeletonURI = null;
-    if (EcoreUtil.getRootContainer(first).eClass() == CapellamodellerPackage.Literals.LIBRARY) {
-      skeletonURI = ReProjectActivator.SKELETON_LIBRARY_URI;
-    } else if (EcoreUtil.getRootContainer(first).eClass() == CapellamodellerPackage.Literals.PROJECT) {
-      skeletonURI = ReProjectActivator.SKELETON_PROJECT_URI;
+    CreateCapellaProjectCmd cmd = null;
+    if (root == CapellamodellerPackage.Literals.PROJECT) {
+      cmd = new CreateCapellaProjectCmd(skeletonResource, "skeleton", ProjectApproach.SingletonComponents); //$NON-NLS-1$
+    } else if (root == CapellamodellerPackage.Literals.LIBRARY) {
+      cmd = new CreateCapellaLibraryCommand(skeletonResource, "skeleton", ProjectApproach.SingletonComponents); //$NON-NLS-1$
     }
 
+    if (cmd != null) {
+      manager.execute(cmd);
+      result = cmd.getProject();
+      new SkeletonServicesImpl().doSystemEngineering(result, result.getName(), EngineeringDomain.System, true);
+    }
+
+    return result;
+  }
+
+  /**
+   * Find all elements in model that are not part of the capella template.
+   */
+  public static Collection<EObject> getAllNonSkeletonElements(EObject context, Predicate<EObject> filter) {
+
+    ExecutionManager skeletonManager = ExecutionManagerRegistry.getInstance().addNewManager();
     Collection<EObject> elementsForRec = new ArrayList<EObject>();
 
-    if (skeletonURI != null) {
+    try {
 
-      ExecutionManager skeletonManager = ExecutionManagerRegistry.getInstance().addNewManager();
+      EObject first = context;
+      Project project = createSkeleton(EcoreUtil.getRootContainer(first).eClass(), skeletonManager);
 
-      try {
-
-        ResourceSet set = skeletonManager.getEditingDomain().getResourceSet();
-        Resource skeletonResource = set.getResource(skeletonURI, true);
-
-        IEditableModelScope targetScope = new FragmentedModelScope(res, true); // For example
-        IEditableModelScope referenceScope = new FragmentedModelScope(skeletonResource, true); // For example
+      if (project != null) {
+        IEditableModelScope targetScope = new FragmentedModelScope(first.eResource(), true);
+        IEditableModelScope referenceScope = new FragmentedModelScope(project.eResource(), true);
 
         IComparison comparison = new EComparisonImpl(targetScope, referenceScope);
         comparison.compute(new SkeletonMatchPolicy(), null, null, new NullProgressMonitor());
@@ -76,12 +91,11 @@ public class SkeletonUtil {
             }
           }
         }
-
-      } finally {
-        ExecutionManagerRegistry.getInstance().removeManager(skeletonManager);
       }
 
-  }
+    } finally {
+      ExecutionManagerRegistry.getInstance().removeManager(skeletonManager);
+    }
 
     return elementsForRec;
   }
