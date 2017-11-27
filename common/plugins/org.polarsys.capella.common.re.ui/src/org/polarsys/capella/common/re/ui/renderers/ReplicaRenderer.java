@@ -226,6 +226,10 @@ public class ReplicaRenderer extends EditListRenderer implements PropertyChangeL
 
   @Override
   public void initialize(IProperty property, IRendererContext rendererContext) {
+
+    rendererContext.getPropertyContext().getCurrentValue(
+        rendererContext.getPropertyContext().getProperties().getProperty(IReConstants.PROPERTY__REPLICABLE_ELEMENT__SUFFIXES));
+
     super.initialize(property, rendererContext);
     rendererContext.getPropertyContext().registerListener(this,
         rendererContext.getPropertyContext().getProperties().getProperty(IReConstants.PROPERTY__REPLICABLE_ELEMENT__SUFFIXES));
