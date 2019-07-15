@@ -17,7 +17,6 @@ import java.util.List;
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -48,11 +47,7 @@ import org.polarsys.capella.common.ui.toolkit.viewers.TreeAndListViewer;
 import org.polarsys.capella.core.business.queries.IBusinessQuery;
 import org.polarsys.capella.core.business.queries.capellacore.BusinessQueriesProvider;
 import org.polarsys.capella.core.data.capellacore.CapellaElement;
-import org.polarsys.capella.core.data.cs.BlockArchitecture;
 import org.polarsys.capella.core.data.cs.Component;
-import org.polarsys.capella.core.data.cs.ComponentContext;
-import org.polarsys.capella.core.data.cs.CsFactory;
-import org.polarsys.capella.core.data.cs.CsPackage;
 import org.polarsys.capella.core.data.cs.ExchangeItemAllocation;
 import org.polarsys.capella.core.data.cs.Interface;
 import org.polarsys.capella.core.data.cs.InterfacePkg;
@@ -70,6 +65,7 @@ import org.polarsys.capella.core.data.interaction.InteractionPackage;
 import org.polarsys.capella.core.data.interaction.MessageKind;
 import org.polarsys.capella.core.data.interaction.properties.controllers.InterfaceHelper;
 import org.polarsys.capella.core.data.interaction.properties.dialogs.Messages;
+import org.polarsys.capella.core.data.interaction.properties.dialogs.sequenceMessage.model.algorithms.CreationAlgorithms;
 import org.polarsys.capella.core.model.handler.provider.CapellaAdapterFactoryProvider;
 import org.polarsys.capella.core.model.helpers.ComponentExt;
 import org.polarsys.capella.core.model.helpers.InterfaceExt;
@@ -492,59 +488,13 @@ public class SelectOperationDialogForSharedDataAndEvent extends SelectElementsDi
   }
 
   /**
-   * Create an {@link Interface} for related to given sequence message with specified name.
-   * @param sequenceMessage
-   * @param interfaceName
-   */
-  private Interface createInterface(String interfaceName) {
-    Interface result = CsFactory.eINSTANCE.createInterface(interfaceName);
-
-    EObject src = _sourceIR != null ? _sourceIR.getRepresentedInstance().eContainer() : null;
-    EObject tgt = _targetIR != null ? _targetIR.getRepresentedInstance().eContainer() : null;
-
-    EObject container = null;
-
-    if ((src != null) && (tgt != null) && (src instanceof Component) && (tgt instanceof Component)) {
-      container = ComponentExt.getFirstCommonComponentAncestor(src, tgt);
-    }
-    if ((container == null) || (container instanceof ComponentContext)) {
-      if (_sourceIR != null) {
-        container = ComponentExt.getRootBlockArchitecture(_sourceIR);
-      } else {
-        container = ComponentExt.getRootBlockArchitecture(_targetIR);
-      }
-    }
-
-    // Retrieve or create an interface pkg into the container
-    EReference referenceInterfacePkg = null;
-    if (container instanceof BlockArchitecture) {
-      referenceInterfacePkg = CsPackage.Literals.BLOCK_ARCHITECTURE__OWNED_INTERFACE_PKG;
-    } else {
-      referenceInterfacePkg = CsPackage.Literals.BLOCK__OWNED_INTERFACE_PKG;
-    }
-
-    if (container.eGet(referenceInterfacePkg) == null) {
-      container.eSet(referenceInterfacePkg, CsFactory.eINSTANCE.createInterfacePkg(Messages.SelectOperationDialog_InterfacePkgName8));
-    }
-
-    // Set the interface into the pkg
-    InterfacePkg pkg = (InterfacePkg) container.eGet(referenceInterfacePkg);
-    pkg.getOwnedInterfaces().add(result);
-
-    org.polarsys.capella.core.model.helpers.CapellaElementExt.creationService(result);
-    result.setName(interfaceName);
-
-    return result;
-  }
-
-  /**
    * Gets or create the selected interface.
    * @return the selected interface
    */
   private Interface getOrCreateInterface() {
     Interface selectedInterface = (Interface) _interfaceText.getData();
     if ((null == selectedInterface) || !(selectedInterface.getName().equals(_interfaceText.getText()))) {
-      selectedInterface = createInterface(_interfaceText.getText());
+      selectedInterface = CreationAlgorithms.INSTANCE.createInterface(_interfaceText.getText(), _sourceIR, _targetIR, false);
       _interfaceText.setData(selectedInterface);
     }
     return selectedInterface;
