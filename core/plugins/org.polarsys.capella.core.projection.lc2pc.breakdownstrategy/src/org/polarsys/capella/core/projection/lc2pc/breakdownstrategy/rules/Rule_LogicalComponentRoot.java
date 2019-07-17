@@ -39,7 +39,7 @@ public class Rule_LogicalComponentRoot extends Rule_LogicalComponent {
   protected EObject transformDirectElement(EObject element_p, IContext context_p) {
     BlockArchitecture architecture = (BlockArchitecture) context_p.get(CapellaEngine.TRANSFO_TARGET_CONTAINER);
     if (architecture != null) {
-      return BlockArchitectureExt.getFirstComponent(architecture);
+      return BlockArchitectureExt.getOrCreateSystem(architecture);
     }
     return super.transformDirectElement(element_p, context_p);
   }

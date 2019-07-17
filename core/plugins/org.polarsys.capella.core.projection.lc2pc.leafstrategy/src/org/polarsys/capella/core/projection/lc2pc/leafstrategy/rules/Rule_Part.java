@@ -45,7 +45,7 @@ public class Rule_Part extends org.polarsys.capella.core.projection.common.rules
     BlockArchitecture architecture = (BlockArchitecture) context_p.get(CapellaEngine.TRANSFO_TARGET_CONTAINER);
     EObject container = element_p.eContainer();
     if (!(container instanceof ComponentContext)) {
-      return BlockArchitectureExt.getFirstComponent(architecture);
+      return BlockArchitectureExt.getOrCreateSystem(architecture);
     }
     return null;
   }

@@ -53,7 +53,7 @@ public class StateMachineTransitionCommand extends AbstractTransitionCommand {
       modelElement = ((Part) modelElement).getAbstractType();
     }
     if (modelElement instanceof BlockArchitecture) {
-      modelElement = BlockArchitectureExt.getFirstComponent(((BlockArchitecture) modelElement));
+      modelElement = BlockArchitectureExt.getOrCreateSystem(((BlockArchitecture) modelElement));
     }
 
     if (modelElement instanceof StateMachine) {
