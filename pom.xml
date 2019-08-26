@@ -55,7 +55,7 @@
 		<target-platform-path>full</target-platform-path>
 		
 		<!-- When building the packages, use the simrel update site instead of a target platform. -->
-		<capella.simrel.repository>https://download.eclipse.org/3p/release/repository/1.2</capella.simrel.repository>
+		<capella.simrel.repository>https://download.eclipse.org/3p/capella/staging/repository/1.3.0</capella.simrel.repository>
 	</properties>
 
 	<modules>
