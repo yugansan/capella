@@ -1,0 +1,42 @@
+pipeline {
+	agent any
+	
+	options {
+		buildDiscarder(logRotator(numToKeepStr: '5', artifactNumToKeepStr: '5'))
+		timestamps()
+	}
+	
+	tools {
+		maven 'Maven3.5.2'
+	}
+	
+	environment {
+		REPO_ROOT = '/home/data/httpd/download.eclipse.org'
+		NIGHTLY_FOLDER = ${BRANCH_NAME}-N${BUILD_ID}
+		TARGET_FOLDER = ${REPO_ROOT}/capella/core/products/simrel-nightly/${NIGHTLY_FOLDER}
+	}
+	
+	stages {
+		stage ('Build Capella RCP product') {
+			steps {
+				sh "mvn clean package -Ppackage-rcp"
+			}
+		}
+		
+		stage ('Deploy packages') {
+			steps {
+				sh '''
+					mkdir -p ${TARGET_FOLDER}
+					cp ${WORKSPACE}/releng/pluugins/org.polarsys.capella.rcp.product/target/products/capella-*.zip ${TARGET_FOLDER}
+				'''
+			}
+		}
+	}
+	
+	post { 
+		always { 
+			archiveArtifacts artifacts: "releng/plugins/org.polarsys.capella.rcp.product/target/products/capella*.zip", fingerprint: true
+			junit "**/tests/**/target/surefire-reports/*.xml"
+		}
+	}
+}
