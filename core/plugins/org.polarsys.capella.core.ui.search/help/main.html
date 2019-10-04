@@ -1,0 +1,82 @@
+<?xml version='1.0' encoding='utf-8' ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+		<link type="text/css" rel="stylesheet" href="PLUGINS_ROOT/org.polarsys.capella.doc/html/styles.css"/>
+	</head>
+	<body>
+		<h1 id="Search_And_Replace">Search And Replace</h1>
+		<ol>
+			<li>In the Capella perspective, click the 
+				<b>Search</b> button in the workbench toolbar
+			</li>
+			<li>If it is not already selected, select the 
+				<b>Capella Search</b> tab 
+				<dl>
+					<dd>
+						<img align="middle" border="0" src="images/CapellaSearchPage.PNG"/>
+					</dd>
+				</dl>
+			</li>
+			<li>In the search page:
+				<ul>
+					<li>A search can look into properties of semantic elements and representations: 
+						<b>Name</b>, 
+						<b>Summary</b> (not available for representations), and 
+						<b>Description</b>.
+					</li>
+					<li>A search can look only into Capella projects with opening session.</li>
+					<li>A search can be performed in two modes: 
+						<b>containing a text</b> or 
+						<b>matching a regular expression</b> (with content assist for finding a right regular expression)
+					</li>
+					<li>A search can be performed only if the validation is passed:
+						<ul>
+							<li>At least one project selected</li>
+							<li>At least one search field selected</li>
+							<li>Search pattern is not empty and is a valid regular expression if the search mode is matching a regular expression.</li>
+						</ul>
+					</li>
+				</ul>
+			</li>
+			<li>Results of search are shown in the 
+				<b>Search</b> view
+				<dl>
+					<dd>
+						<img align="middle" border="0" src="images/CapellaSearchResultPage.png"/>
+					</dd>
+				</dl>
+				<ul>
+					<li>Matched occurrences are grouped by project and element</li>
+					<li>Matched occurrences are highlighted within the line containing it</li>
+					<li>Matched occurrences can be filtered from the view by: 
+						<b>Capella Element</b>, 
+						<b>Representation</b> or 
+						<b>Not Modifiable</b>
+					</li>
+					<li>Search results are stored in history and can be replayed</li>
+					<li>Navigate to matched elements from 
+						<b>Search</b> view to others Capella views and vice versa
+					</li>
+					<li>Perform replace on selected occurrences</li>
+				</ul>
+			</li>
+			<li>Replace can be performed from:
+				<ul>
+					<li>
+						<b>Replace</b> button in the search dialog: All matched occurrences will be replaced
+					</li>
+					<li>
+						<b>Replace all...</b> and 
+						<b>Replace selected...</b> menu items in the search result view: Only selected occurrences will be replaced
+						<dl>
+							<dd>
+								<img align="middle" border="0" src="images/CapellaReplaceDialog.PNG"/>
+							</dd>
+						</dl>
+					</li>
+				</ul>
+			</li>
+		</ol>
+	</body>
+</html>
