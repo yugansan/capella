@@ -425,11 +425,19 @@ public class OAServices {
     // Get source OA displayed in diagram for FE (it can be a parent of the real source OA).
     OperationalActivity sourceOA = (OperationalActivity) sourceFunction;
     EObject parent = sourceOA;
-    while (parent instanceof OperationalActivity) {
-      if (displayedActivities.contains(parent)) {
-        return ((OperationalActivity) parent);
+
+    EObject targetSContainer = interaction.getTarget().eContainer();
+    EObject sourceSContainer = interaction.getSource().eContainer();
+    if (!targetSContainer.equals(sourceSContainer)) {
+      while (parent instanceof OperationalActivity) {
+        if (displayedActivities.contains(parent)) {
+          if (parent.equals(targetSContainer.eContainer())) {
+            return null;
+          }
+          return ((OperationalActivity) parent);
+        }
+        parent = parent.eContainer();
       }
-      parent = parent.eContainer();
     }
     return sourceOA;
   }
@@ -450,11 +458,20 @@ public class OAServices {
     // Get target OA displayed in diagram for FE (it can be a parent of the real target OA).
     OperationalActivity targetOA = (OperationalActivity) targetFunction;
     EObject parent = targetOA;
-    while (parent instanceof OperationalActivity) {
-      if (displayedActivities.contains(parent)) {
-        return ((OperationalActivity) parent);
+
+    EObject targetSContainer = interaction.getTarget().eContainer();
+    EObject sourceSContainer = interaction.getSource().eContainer();
+
+    if (!targetSContainer.equals(sourceSContainer)) {
+      while (parent instanceof OperationalActivity) {
+        if (displayedActivities.contains(parent)) {
+          if (parent.equals(targetSContainer.eContainer())) {
+            return null;
+          }
+          return ((OperationalActivity) parent);
+        }
+        parent = parent.eContainer();
       }
-      parent = parent.eContainer();
     }
     return targetOA;
   }
